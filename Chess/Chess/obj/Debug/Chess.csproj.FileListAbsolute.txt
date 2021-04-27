@@ -1,0 +1,5 @@
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.csprojAssemblyReference.cache
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\MainWindow.g.cs
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\App.g.cs
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess_MarkupCompile.cache
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess_MarkupCompile.lref

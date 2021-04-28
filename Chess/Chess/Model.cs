@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace Chess
 {
@@ -40,7 +41,7 @@ namespace Chess
             set { destY = value; }
         }
 
-        private string FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        private string FEN = "5rk1/6p1/6Rp/2p1p3/1pq5/5P1P/P6P/R2Q2NK b - - 0 32";
 
         public string FENotation
         {
@@ -64,6 +65,13 @@ namespace Chess
             set { board = value; }
         }
 
+        private Grid extBoard;
+
+        public Grid ExternalBoard
+        {
+            get { return extBoard; }
+            set { extBoard = value; }
+        }
 
     }
 }

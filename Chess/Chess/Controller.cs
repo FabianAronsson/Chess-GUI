@@ -28,21 +28,22 @@ namespace Chess
         public Piece [,] CreatePieces()
         {
             PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
-            Piece[,] pieces = new Piece[7,7];
+            Piece[,] pieces = new Piece[8,8];
             char[] FENotation = ConvertStringToCharArray(model.FENotation);
             int xIndex = 0;
             int yIndex = 0;
             int index = 0;
-            while (true) // todo check if code works logically, seems to work, need actual testing
+            bool a = false;
+            while (true) // todo check if code works logically, seems to work, needs actual testing
             { 
-                if (char.IsDigit(FENotation[index])){
-                    if (Convert.ToInt32(FENotation[index]) >= 8)
+                if (Char.IsDigit(FENotation[index])){
+                    if (int.Parse(FENotation[index].ToString()) >= 8)
                     {
                         xIndex = 0;
                     }
                     else
                     {
-                        xIndex += Convert.ToInt32(FENotation[index]) - 1;
+                        xIndex += Convert.ToInt32(FENotation[index].ToString());
                     }
                 }
                 else if (FENotation[index].Equals('/'))
@@ -57,7 +58,15 @@ namespace Chess
                 else
                 {
                     pieces[yIndex, xIndex] = factory.CreatePiece(FENotation[index], IsFENPieceBlack(FENotation, index));
-                    xIndex++;
+                    if(xIndex == 7)
+                    {
+                        xIndex = 0;
+                    }
+                    else
+                    {
+                        xIndex++;
+                    }
+                    
                 }
                 index++; 
             }
@@ -82,7 +91,7 @@ namespace Chess
             return str.ToCharArray();
         }
 
-        public Grid CreateGrid()
+        /*public Grid CreateGrid() // encapsulate code?
         {
             Grid board = new Grid
             {
@@ -97,8 +106,10 @@ namespace Chess
             ImageBrush background = new ImageBrush();
             background.ImageSource = new BitmapImage(new Uri("./../../Images/Board.png", UriKind.Relative));
             board.Background = background;
-            board.Children.Add(new Button());
+            model.ExternalBoard = board;
             return board;
-        }
+        }*/
+
+      
     }
 }

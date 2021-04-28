@@ -26,13 +26,14 @@ namespace Chess
         {
             InitializeComponent();
             controller = Controller.InitMainController();
-            CreateBoard();
-            //SetPiecesToBoard(GeneratePieces());
+            //CreateBoard();
+            SetPiecesToBoard(GeneratePieces());
+            //(controller.a(GeneratePieces()));
         }
 
         public void CreateBoard()
         {
-            Board.Children.Add(controller.CreateGrid());
+           // Board.Children.Add(controller.CreateGrid());
             
         }
 
@@ -43,15 +44,23 @@ namespace Chess
 
         public void SetPiecesToBoard(Piece[,] pieces)
         {
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 8; i++)
             {
-                for (int j = 0; j < 7; j++)
+                for (int j = 0; j < 8; j++)
                 {
-                    /*Grid.SetColumn(i); 
-                    Grid.SetRow(j);*/
+                    if (pieces[i, j] != null)
+                    {
+                        Piece currentPiece = pieces[i, j];
+                        Grid.SetRow(currentPiece, i);
+                        Grid.SetColumn(currentPiece, j);
+                        Board.Children.Add(currentPiece);
+                    }
+
                 }
             }
-            
+
         }
+
+        
     }
 }

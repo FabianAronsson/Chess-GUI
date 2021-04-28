@@ -72,10 +72,12 @@
   <ItemGroup>
     <Compile Include="Model.cs" />
     <Compile Include="PieceFactory\Bishop.cs" />
+    <Compile Include="PieceFactory\IPieceFactory.cs" />
     <Compile Include="PieceFactory\King.cs" />
     <Compile Include="PieceFactory\Knight.cs" />
     <Compile Include="PieceFactory\Pawn.cs" />
     <Compile Include="PieceFactory\Piece.cs" />
+    <Compile Include="PieceFactory\PieceFactory.cs" />
     <Compile Include="PieceFactory\Queen.cs" />
     <Compile Include="PieceFactory\Rook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

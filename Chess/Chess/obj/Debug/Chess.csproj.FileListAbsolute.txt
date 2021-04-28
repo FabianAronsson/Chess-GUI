@@ -3,3 +3,13 @@ D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\MainW
 D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\App.g.cs
 D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess_MarkupCompile.cache
 D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess_MarkupCompile.lref
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\bin\Debug\Chess.exe.config
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\bin\Debug\Chess.exe
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\bin\Debug\Chess.pdb
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\MainWindow.baml
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.g.resources
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.Properties.Resources.resources
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.csproj.GenerateResource.cache
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.csproj.CoreCompileInputs.cache
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.exe
+D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.pdb

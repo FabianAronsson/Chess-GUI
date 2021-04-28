@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess.PieceFactory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,18 +26,32 @@ namespace Chess
         {
             InitializeComponent();
             controller = Controller.InitMainController();
-            SetPiecesToBoard(CreateBoard());
+            CreateBoard();
+            //SetPiecesToBoard(GeneratePieces());
         }
 
-        public PieceFactory.Piece[,] CreateBoard()
+        public void CreateBoard()
+        {
+            Board.Children.Add(controller.CreateGrid());
+            
+        }
+
+        public PieceFactory.Piece[,] GeneratePieces()
         {
             return controller.CreatePieces();
         }
 
-        public void SetPiecesToBoard(PieceFactory.Piece[,] pieces)
+        public void SetPiecesToBoard(Piece[,] pieces)
         {
-            Grid.SetColumn(y); //fix
-            Grid.SetRow(x);
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    /*Grid.SetColumn(i); 
+                    Grid.SetRow(j);*/
+                }
+            }
+            
         }
     }
 }

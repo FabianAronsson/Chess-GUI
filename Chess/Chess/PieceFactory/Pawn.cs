@@ -15,8 +15,6 @@ namespace Chess.PieceFactory
         {
             return new Pawn();
         }
-
-
     }
 
 }

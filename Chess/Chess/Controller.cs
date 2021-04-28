@@ -20,23 +20,46 @@ namespace Chess
             return new Controller();
         }
         
-        
+        //todo document method
         public PieceFactory.Piece [,] CreatePieces()
         {
             PieceFactory.Piece[,] pieces = new PieceFactory.Piece[7,7];
             char[] FENotation = ConvertStringToCharArray(model.FENotation);
-               
-            for (int i = 0; i < 63; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    if (i < 15)
+            int xIndex = 0;
+            int yIndex = 0;
+            int index = 0;
+            while (true) // todo check if code works logically
+            { 
+                if (char.IsDigit(FENotation[index])){
+                    if (Convert.ToInt32(FENotation[index]) <= 8)
                     {
-                        pieces[i,j] = TranslateFEN(FENotation[i]);
+                        xIndex = 0;
+                    }
+                    else
+                    {
+                        xIndex += Convert.ToInt32(FENotation[index]);
                     }
                 }
-                
+                else if (FENotation[index].Equals('/'))
+                {
+                    yIndex++;
+                }
+                else if (xIndex == 8) // refactor code? maybe?
+                {
+                    xIndex = 0;
+                }
+                else if(FENotation[index].Equals(' '))
+                {
+                    break;
+                }
+                else
+                {
+                    pieces[yIndex, xIndex] = TranslateFEN(FENotation[index]);
+                    xIndex++;
+                }
+                index++; 
             }
+            return pieces;
         }
 
         public PieceFactory.Piece TranslateFEN (char FENotation)

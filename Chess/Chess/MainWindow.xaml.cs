@@ -30,12 +30,13 @@ namespace Chess
 
         public PieceFactory.Piece[,] CreateBoard()
         {
-            
+            return controller.CreatePieces();
         }
 
         public void SetPiecesToBoard(PieceFactory.Piece[,] pieces)
         {
-
+            Grid.SetColumn(y); //fix
+            Grid.SetRow(x);
         }
     }
 }

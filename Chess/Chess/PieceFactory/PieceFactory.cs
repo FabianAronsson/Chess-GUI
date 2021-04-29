@@ -160,9 +160,17 @@ namespace Chess.PieceFactory
                         Background = Brushes.Transparent,
                         BorderThickness = new Thickness(0)
                     };
+                    
+                case 'S':
+                    return new EmpySquare
+                    {
+                        isSpecialPiece = isBlack, //Inaccurate naming, but works
+                        Background = Brushes.Transparent,
+                        BorderThickness = new Thickness(0),
+                        OverridesDefaultStyle = true
+                    };
                 default:
                     return null;
-
             }
         }
     }

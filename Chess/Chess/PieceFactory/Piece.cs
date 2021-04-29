@@ -11,6 +11,7 @@ namespace Chess.PieceFactory
     public abstract class Piece : Button
     {
         public bool isBlack;
+        public List<string> legalMoves;
         public abstract Piece CreatePiece();
     }
 }

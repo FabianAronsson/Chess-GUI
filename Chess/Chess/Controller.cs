@@ -38,10 +38,22 @@ namespace Chess
                 if (char.IsDigit(FENotation[index])){
                     if (int.Parse(FENotation[index].ToString()) == 8)
                     {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            pieces[yIndex, xIndex] = factory.CreatePiece('S', true);
+                            xIndex++;
+                        }
                         xIndex = 0;
                     }
                     else
                     {
+                        int tempIndex = xIndex;
+                        for (int i = 0; i < int.Parse(FENotation[index].ToString()); i++)
+                        {
+                            pieces[yIndex, tempIndex] = factory.CreatePiece('S', true);
+                            tempIndex++;
+                        }
+                        
                         xIndex += Convert.ToInt32(FENotation[index].ToString());
                     }
                 }
@@ -90,10 +102,47 @@ namespace Chess
             return str.ToCharArray();
         }
 
-        public Button CreateEmptySquare()
+        public void SaveCoordinates(int y, int x)
         {
-            return null;
+            if (model.YSourceCoordinate != y && model.XSourceCoordinate != x )
+            {
+                if (!model.IsPieceSelected)
+                {
+                    model.YSourceCoordinate = y;
+                    model.XSourceCoordinate = x;
+                    model.IsPieceSelected = true;
+                }
+                else
+                {
+                    model.DestinationY = y;
+                    model.DestinationX = x;
+                }
+            }
         }
+
+        public bool IsPieceSelected()
+        {
+            return model.IsPieceSelected;
+        }
+
+        public bool IsMoveLegal()
+        {
+            Piece piece = model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
+            for (int i = 0; i < piece.legalMoves.Count; i++)
+            {
+                if (piece.legalMoves[i] == ConvertIntToString(model.DestinationY, model.DestinationX))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public string ConvertIntToString(int y, int x)
+        {
+            return y + " " + x;
+        }
+
 
         /*public Grid CreateGrid() // encapsulate code?
         {

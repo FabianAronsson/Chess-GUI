@@ -20,7 +20,7 @@ namespace Chess
 
         private int srcY;
 
-        public int YSouceCoordinate
+        public int YSourceCoordinate
         {
             get { return srcY; }
             set { srcY = value; }
@@ -71,6 +71,14 @@ namespace Chess
         {
             get { return extBoard; }
             set { extBoard = value; }
+        }
+
+        private bool pieceSelected;
+
+        public bool IsPieceSelected
+        {
+            get { return pieceSelected; }
+            set { pieceSelected = value; }
         }
 
     }

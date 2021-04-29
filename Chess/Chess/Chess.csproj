@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="Model.cs" />
     <Compile Include="PieceFactory\Bishop.cs" />
+    <Compile Include="PieceFactory\EmpySquare.cs" />
     <Compile Include="PieceFactory\IPieceFactory.cs" />
     <Compile Include="PieceFactory\King.cs" />
     <Compile Include="PieceFactory\Knight.cs" />

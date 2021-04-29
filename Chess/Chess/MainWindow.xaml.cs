@@ -27,18 +27,41 @@ namespace Chess
             InitializeComponent();
             controller = Controller.InitMainController();
             //CreateBoard();
-            SetPiecesToBoard(GeneratePieces());
-            //(controller.a(GeneratePieces()));
-            FillBoardWithButtons();
+            
         }
 
+        //Event handler for creating the board. Instead of including it in the constructor for Mainwindow, 
+        //the board is created ONLY when the grid is fully loaded.
+        private void SetupBoard(object sender, RoutedEventArgs e)
+        {
+            SetPiecesToBoard(GeneratePieces());
+        }
+
+        public void MovePiece(object sender, RoutedEventArgs e)
+        {
+            if(!(e.Source is EmpySquare))
+            {
+                if(e.Source is Piece piece)
+                {
+                    controller.SaveCoordinates(Grid.GetRow(piece), Grid.GetColumn(piece));
+                    //display legal moves
+                    if (controller.IsPieceSelected())
+                    {
+                        if (controller.IsMoveLegal())
+                        {
+                            //move piece
+                        }
+                    }
+                }
+            }
+        }
         public void CreateBoard()
         {
            // Board.Children.Add(controller.CreateGrid());
             
         }
 
-        public PieceFactory.Piece[,] GeneratePieces()
+        public Piece[,] GeneratePieces()
         {
             return controller.CreatePieces();
         }
@@ -51,30 +74,12 @@ namespace Chess
                 {
                     if (pieces[i, j] != null)
                     {
+                        pieces[i, j].Click += new RoutedEventHandler(MovePiece);
                         Piece currentPiece = pieces[i, j];
                         Grid.SetRow(currentPiece, i);
                         Grid.SetColumn(currentPiece, j);
                         Board.Children.Add(currentPiece);
                     }
-                }
-            }
-        }
-
-        public void FillBoardWithButtons()
-        {
-            int y = 0;
-            int x = 0;
-
-            for (int i = 0; i < 7; i++)
-            {
-                for (int j = 0; j < 7; j++)
-                {
-                    if (Board.Children.Cast<UIElement>().First(e => Grid.GetRow(e) == y && Grid.GetColumn(e) == x) == null)
-                    {
-
-                    }
-                    
-                    
                 }
             }
         }

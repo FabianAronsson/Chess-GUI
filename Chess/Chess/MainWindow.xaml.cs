@@ -29,6 +29,7 @@ namespace Chess
             //CreateBoard();
             SetPiecesToBoard(GeneratePieces());
             //(controller.a(GeneratePieces()));
+            FillBoardWithButtons();
         }
 
         public void CreateBoard()
@@ -55,12 +56,27 @@ namespace Chess
                         Grid.SetColumn(currentPiece, j);
                         Board.Children.Add(currentPiece);
                     }
-
                 }
             }
-
         }
 
-        
+        public void FillBoardWithButtons()
+        {
+            int y = 0;
+            int x = 0;
+
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    if (Board.Children.Cast<UIElement>().First(e => Grid.GetRow(e) == y && Grid.GetColumn(e) == x) == null)
+                    {
+
+                    }
+                    
+                    
+                }
+            }
+        }
     }
 }

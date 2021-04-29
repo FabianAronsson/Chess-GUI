@@ -114,11 +114,13 @@
     <Resource Include="Images\Queen.png" />
     <Resource Include="Images\Rook.png" />
     <Resource Include="Images\wBishop.png" />
-    <Resource Include="Images\wKing.png" />
     <Resource Include="Images\wKnight.png" />
     <Resource Include="Images\wPawn.png" />
     <Resource Include="Images\wQueen.png" />
     <Resource Include="Images\wRook.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\wKing.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

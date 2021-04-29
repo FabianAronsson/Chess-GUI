@@ -33,11 +33,10 @@ namespace Chess
             int xIndex = 0;
             int yIndex = 0;
             int index = 0;
-            bool a = false;
-            while (true) // todo check if code works logically, seems to work, needs actual testing
+            while (true) 
             { 
-                if (Char.IsDigit(FENotation[index])){
-                    if (int.Parse(FENotation[index].ToString()) >= 8)
+                if (char.IsDigit(FENotation[index])){
+                    if (int.Parse(FENotation[index].ToString()) == 8)
                     {
                         xIndex = 0;
                     }
@@ -86,9 +85,14 @@ namespace Chess
             }
         }
 
-        public char[] ConvertStringToCharArray (string str)
+        public char[] ConvertStringToCharArray(string str)
         {
             return str.ToCharArray();
+        }
+
+        public Button CreateEmptySquare()
+        {
+            return null;
         }
 
         /*public Grid CreateGrid() // encapsulate code?

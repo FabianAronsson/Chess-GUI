@@ -104,8 +104,7 @@ namespace Chess
 
         public void SaveCoordinates(int y, int x)
         {
-            if (model.YSourceCoordinate != y && model.XSourceCoordinate != x )
-            {
+            
                 if (!model.IsPieceSelected)
                 {
                     model.YSourceCoordinate = y;
@@ -116,20 +115,32 @@ namespace Chess
                 {
                     model.DestinationY = y;
                     model.DestinationX = x;
+                    model.IsDestinationPieceSelected = true;
                 }
+            
+        }
+
+        public bool IsDestinationPieceSelected()
+        {
+            return model.IsDestinationPieceSelected;
+        }
+
+        public void SavePositionOfSquare(int y, int x)
+        {
+            if (model.IsPieceSelected)
+            {
+                model.DestinationY = y;
+                model.DestinationX = x;
+                model.IsDestinationPieceSelected = true;
             }
         }
 
-        public bool IsPieceSelected()
-        {
-            return model.IsPieceSelected;
-        }
-
+        //todo document method
         public bool IsMoveLegal()
         {
             Piece piece = model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
             for (int i = 0; i < piece.legalMoves.Count; i++)
-            {
+            { //Needs more validation
                 if (piece.legalMoves[i] == ConvertIntToString(model.DestinationY, model.DestinationX))
                 {
                     return true;
@@ -141,6 +152,24 @@ namespace Chess
         public string ConvertIntToString(int y, int x)
         {
             return y + " " + x;
+        }
+
+        public Piece[,] UpdateMovesOnBoard()
+        {
+            PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
+            Piece[,] pieces = model.InternalBoard;
+            Piece sourcePiece = model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
+
+            pieces[model.YSourceCoordinate, model.XSourceCoordinate] = factory.CreatePiece('S', true);
+            pieces[model.DestinationY, model.DestinationX] = sourcePiece;
+
+            return model.InternalBoard = pieces;
+        }
+
+        public void ResetSelectedPieceValues()
+        {
+            model.IsPieceSelected = false;
+            model.IsDestinationPieceSelected = false;
         }
 
 
@@ -163,6 +192,6 @@ namespace Chess
             return board;
         }*/
 
-      
+
     }
 }

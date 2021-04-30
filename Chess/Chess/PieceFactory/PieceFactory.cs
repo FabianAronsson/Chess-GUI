@@ -162,12 +162,12 @@ namespace Chess.PieceFactory
                     };
                     
                 case 'S':
-                    return new EmpySquare
+                    return new EmptySquare
                     {
                         isSpecialPiece = isBlack, //Inaccurate naming, but works
                         Background = Brushes.Transparent,
                         BorderThickness = new Thickness(0),
-                        OverridesDefaultStyle = true
+                        //OverridesDefaultStyle = true
                     };
                 default:
                     return null;

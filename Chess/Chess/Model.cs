@@ -81,5 +81,14 @@ namespace Chess
             set { pieceSelected = value; }
         }
 
+        private bool destinationPiece;
+
+        public bool IsDestinationPieceSelected
+        {
+            get { return destinationPiece; }
+            set { destinationPiece = value; }
+        }
+
+
     }
 }

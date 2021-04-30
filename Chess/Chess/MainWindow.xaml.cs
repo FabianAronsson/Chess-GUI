@@ -37,36 +37,53 @@ namespace Chess
             SetPiecesToBoard(GeneratePieces());
         }
 
-        public void MovePiece(object sender, RoutedEventArgs e)
+        private void MovePiece(object sender, RoutedEventArgs e)
         {
-            if(!(e.Source is EmpySquare))
-            {
+            
                 if(e.Source is Piece piece)
                 {
+                
                     controller.SaveCoordinates(Grid.GetRow(piece), Grid.GetColumn(piece));
-                    //display legal moves
-                    if (controller.IsPieceSelected())
-                    {
-                        if (controller.IsMoveLegal())
-                        {
-                            //move piece
-                        }
-                    }
+                //display legal moves
+                CanPlayerMakeMove();
+            }
+            
+        }
+
+        private void CanPlayerMakeMove()
+        {
+            if (controller.IsDestinationPieceSelected())
+            {
+                if (true) //controller.IsMoveLegal()
+                {
+                    UpdateBoard(); //move piece
+                    controller.ResetSelectedPieceValues();
                 }
             }
         }
-        public void CreateBoard()
+
+        private void RemovePieces()
+        {
+            Board.Children.Clear();
+        }
+
+        private void UpdateBoard()
+        {
+            RemovePieces();
+            SetPiecesToBoard(controller.UpdateMovesOnBoard());
+        }
+        public void CreateBoard() //stub, is not possible to do currently.
         {
            // Board.Children.Add(controller.CreateGrid());
             
         }
 
-        public Piece[,] GeneratePieces()
+        private Piece[,] GeneratePieces()
         {
             return controller.CreatePieces();
         }
 
-        public void SetPiecesToBoard(Piece[,] pieces)
+        private void SetPiecesToBoard(Piece[,] pieces)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -74,14 +91,31 @@ namespace Chess
                 {
                     if (pieces[i, j] != null)
                     {
-                        pieces[i, j].Click += new RoutedEventHandler(MovePiece);
+                        if(pieces[i, j] is EmptySquare)
+                        {
+                            pieces[i, j].Click += new RoutedEventHandler(GetPositionOfSquare);
+                        }
+                        else
+                        {
+                          pieces[i, j].Click += new RoutedEventHandler(MovePiece); 
+                        }
+
                         Piece currentPiece = pieces[i, j];
+
                         Grid.SetRow(currentPiece, i);
                         Grid.SetColumn(currentPiece, j);
+
                         Board.Children.Add(currentPiece);
                     }
                 }
             }
+        }
+
+        private void GetPositionOfSquare(object sender, RoutedEventArgs e)
+        {
+            if(e.Source is EmptySquare square)
+            controller.SavePositionOfSquare(Grid.GetRow(square), Grid.GetColumn(square));
+            CanPlayerMakeMove();
         }
     }
 }

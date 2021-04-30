@@ -31,7 +31,9 @@
             <Grid.Background>
                 <ImageBrush ImageSource="./../Images/Board.png"/>
             </Grid.Background>
-
         </Grid>
+
+        
     </Grid>
+    
 </Window>

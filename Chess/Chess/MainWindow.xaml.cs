@@ -35,6 +35,7 @@ namespace Chess
         private void SetupBoard(object sender, RoutedEventArgs e)
         {
             SetPiecesToBoard(GeneratePieces());
+           
         }
 
         private void MovePiece(object sender, RoutedEventArgs e)
@@ -42,7 +43,6 @@ namespace Chess
             
                 if(e.Source is Piece piece)
                 {
-                
                     controller.SaveCoordinates(Grid.GetRow(piece), Grid.GetColumn(piece));
                 //display legal moves
                 CanPlayerMakeMove();
@@ -62,16 +62,40 @@ namespace Chess
             }
         }
 
-        private void RemovePieces()
+        //todo document method
+        private void RemovePiece(List<int> coordinates)
         {
-            Board.Children.Clear();
+            var piece = Board.Children.Cast<UIElement>().First(pieceOnBoard
+                    => Grid.GetRow(pieceOnBoard) == coordinates[0] && Grid.GetColumn(pieceOnBoard) == coordinates[1]);
+            Grid.SetColumn(piece, coordinates[1]);
+            Grid.SetRow(piece, coordinates[0]);
+            Board.Children.Remove(piece);
         }
 
+        //todo document method
         private void UpdateBoard()
         {
-            RemovePieces();
-            SetPiecesToBoard(controller.UpdateMovesOnBoard());
+            List<int> sourceCoordinates = controller.GetSourceCoordinates();
+            List<int> destinationCoordinates = controller.GetDestinationCoordinates();
+            RemovePiece(sourceCoordinates); //remove source piece
+            RemovePiece(destinationCoordinates); //remove destination piece
+
+            var emptySquare = controller.CreatePiece('S', true);
+            emptySquare.Click += new RoutedEventHandler(GetPositionOfSquare);
+
+            SetPieceToBoard(sourceCoordinates, emptySquare);
+            SetPieceToBoard(destinationCoordinates, controller.GetSourcePiece());
+            controller.UpdateMovesOnBoard();
+
         }
+
+        private void SetPieceToBoard(List<int> coordinates, Piece piece)
+        {
+            Grid.SetRow(piece, coordinates[0]);
+            Grid.SetColumn(piece, coordinates[1]);
+            Board.Children.Add(piece);
+        }
+
         public void CreateBoard() //stub, is not possible to do currently.
         {
            // Board.Children.Add(controller.CreateGrid());

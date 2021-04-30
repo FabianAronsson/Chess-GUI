@@ -85,6 +85,8 @@ namespace Chess
             return pieces;
         }
 
+        
+
         public bool IsFENPieceBlack (char [] FENChar, int index)
         {
             if (char.IsLower(FENChar[index]))
@@ -154,7 +156,7 @@ namespace Chess
             return y + " " + x;
         }
 
-        public Piece[,] UpdateMovesOnBoard()
+        public void UpdateMovesOnBoard()
         {
             PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
             Piece[,] pieces = model.InternalBoard;
@@ -162,8 +164,8 @@ namespace Chess
 
             pieces[model.YSourceCoordinate, model.XSourceCoordinate] = factory.CreatePiece('S', true);
             pieces[model.DestinationY, model.DestinationX] = sourcePiece;
-
-            return model.InternalBoard = pieces;
+            model.InternalBoard = pieces;
+            
         }
 
         public void ResetSelectedPieceValues()
@@ -172,6 +174,28 @@ namespace Chess
             model.IsDestinationPieceSelected = false;
         }
 
+        public Piece GetSourcePiece()
+        {
+            return model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
+        }
+
+        public Piece CreatePiece(char typeOfPiece, bool isBlack)
+        {
+            PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
+            return factory.CreatePiece(typeOfPiece, isBlack);
+        }
+
+        public List<int> GetDestinationCoordinates()
+        {
+            List<int> coords = new List<int> { model.DestinationY, model.DestinationX };
+            return coords;
+        }
+
+        public List<int> GetSourceCoordinates()
+        {
+            List<int> coords = new List<int> { model.YSourceCoordinate, model.XSourceCoordinate };
+            return coords;
+        }
 
         /*public Grid CreateGrid() // encapsulate code?
         {

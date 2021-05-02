@@ -8,6 +8,7 @@ namespace Chess.PieceFactory
 {
     public class Bishop : Piece
     {
+
         public override Piece CreatePiece()
         {
             return new Bishop();

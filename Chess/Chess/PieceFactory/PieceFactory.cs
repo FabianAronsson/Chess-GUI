@@ -19,6 +19,7 @@ namespace Chess.PieceFactory
                 case 'r':
                     return new Rook
                     {
+                        typeOfPiece = "Rook",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -31,6 +32,7 @@ namespace Chess.PieceFactory
                 case 'n':
                     return new Knight
                     {
+                        typeOfPiece = "Knight",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -43,6 +45,7 @@ namespace Chess.PieceFactory
                 case 'b':
                     return new Bishop
                     {
+                        typeOfPiece = "Bishop",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -55,6 +58,7 @@ namespace Chess.PieceFactory
                 case 'q':
                     return new Queen
                     {
+                        typeOfPiece = "Queen",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -67,6 +71,7 @@ namespace Chess.PieceFactory
                 case 'k':
                     return new King
                     {
+                        typeOfPiece = "King",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -79,6 +84,7 @@ namespace Chess.PieceFactory
                 case 'p':
                     return new Pawn
                     {
+                        typeOfPiece = "Pawn",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -91,6 +97,7 @@ namespace Chess.PieceFactory
                 case 'R':
                     return new Rook
                     {
+                        typeOfPiece = "Rook",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -103,6 +110,7 @@ namespace Chess.PieceFactory
                 case 'N':
                     return new Knight
                     {
+                        typeOfPiece = "Knight",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -115,6 +123,7 @@ namespace Chess.PieceFactory
                 case 'B':
                     return new Bishop
                     {
+                        typeOfPiece = "Bishop",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -127,6 +136,7 @@ namespace Chess.PieceFactory
                 case 'Q':
                     return new Queen
                     {
+                        typeOfPiece = "Queen",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -139,6 +149,7 @@ namespace Chess.PieceFactory
                 case 'K':
                     return new King
                     {
+                        typeOfPiece = "King",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -151,6 +162,7 @@ namespace Chess.PieceFactory
                 case 'P':
                     return new Pawn
                     {
+                        typeOfPiece = "Pawn",
                         isBlack = isBlack,
                         Content = new Image
                         {
@@ -164,6 +176,7 @@ namespace Chess.PieceFactory
                 case 'S':
                     return new EmptySquare
                     {
+                        typeOfPiece = "Square",
                         isSpecialPiece = isBlack, //Inaccurate naming, but works
                         Background = Brushes.Transparent,
                         BorderThickness = new Thickness(0),

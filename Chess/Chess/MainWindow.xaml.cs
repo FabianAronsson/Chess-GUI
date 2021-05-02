@@ -27,7 +27,7 @@ namespace Chess
             InitializeComponent();
             controller = Controller.InitMainController();
             //CreateBoard();
-            
+
         }
 
         //Event handler for creating the board. Instead of including it in the constructor for Mainwindow, 
@@ -35,29 +35,34 @@ namespace Chess
         private void SetupBoard(object sender, RoutedEventArgs e)
         {
             SetPiecesToBoard(GeneratePieces());
-           
+            controller.GenerateLegalMoves();
+
         }
 
         private void MovePiece(object sender, RoutedEventArgs e)
         {
-            
-                if(e.Source is Piece piece)
-                {
-                    controller.SaveCoordinates(Grid.GetRow(piece), Grid.GetColumn(piece));
+
+            if (e.Source is Piece piece)
+            {
+                controller.SaveCoordinates(Grid.GetRow(piece), Grid.GetColumn(piece));
                 //display legal moves
                 CanPlayerMakeMove();
             }
-            
+
         }
 
         private void CanPlayerMakeMove()
         {
             if (controller.IsDestinationPieceSelected())
             {
-                if (true) //controller.IsMoveLegal()
+                if (controller.IsMoveLegal()) //controller.IsMoveLegal()
                 {
                     UpdateBoard(); //move piece
                     controller.ResetSelectedPieceValues();
+                }
+                else
+                {
+                    //reset piece values
                 }
             }
         }
@@ -83,8 +88,11 @@ namespace Chess
             var emptySquare = controller.CreatePiece('S', true);
             emptySquare.Click += new RoutedEventHandler(GetPositionOfSquare);
 
+            //set pieces to board
             SetPieceToBoard(sourceCoordinates, emptySquare);
             SetPieceToBoard(destinationCoordinates, controller.GetSourcePiece());
+
+            //reflect the visual change to the internal board
             controller.UpdateMovesOnBoard();
 
         }
@@ -98,8 +106,8 @@ namespace Chess
 
         public void CreateBoard() //stub, is not possible to do currently.
         {
-           // Board.Children.Add(controller.CreateGrid());
-            
+            // Board.Children.Add(controller.CreateGrid());
+
         }
 
         private Piece[,] GeneratePieces()
@@ -115,13 +123,13 @@ namespace Chess
                 {
                     if (pieces[i, j] != null)
                     {
-                        if(pieces[i, j] is EmptySquare)
+                        if (pieces[i, j] is EmptySquare)
                         {
                             pieces[i, j].Click += new RoutedEventHandler(GetPositionOfSquare);
                         }
                         else
                         {
-                          pieces[i, j].Click += new RoutedEventHandler(MovePiece); 
+                            pieces[i, j].Click += new RoutedEventHandler(MovePiece);
                         }
 
                         Piece currentPiece = pieces[i, j];
@@ -137,9 +145,11 @@ namespace Chess
 
         private void GetPositionOfSquare(object sender, RoutedEventArgs e)
         {
-            if(e.Source is EmptySquare square)
-            controller.SavePositionOfSquare(Grid.GetRow(square), Grid.GetColumn(square));
-            CanPlayerMakeMove();
+            if (e.Source is EmptySquare square)
+            {
+                controller.SavePositionOfSquare(Grid.GetRow(square), Grid.GetColumn(square));
+                CanPlayerMakeMove();
+            }
         }
     }
 }

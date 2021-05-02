@@ -40,8 +40,9 @@ namespace Chess
             get { return destY; }
             set { destY = value; }
         }
-
-        private string FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        
+        //standard setup for chess, can be substituted for any position
+        private string FEN = "rrrrrrrr/rrrrrrrr/8/8/8/8/RRRRRRRR/RRRRRRRR w - - 0 1";
 
         public string FENotation
         {

@@ -11,6 +11,7 @@ namespace Chess.PieceFactory
         public bool isInCheck = false;
         public bool canCastleK = true;
         public bool canCastleQ = true;
+
         public override Piece CreatePiece()
         {
             return new King();

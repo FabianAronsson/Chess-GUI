@@ -165,7 +165,7 @@ namespace Chess
             pieces[model.YSourceCoordinate, model.XSourceCoordinate] = factory.CreatePiece('S', true);
             pieces[model.DestinationY, model.DestinationX] = sourcePiece;
             model.InternalBoard = pieces;
-            
+
         }
 
         public void ResetSelectedPieceValues()
@@ -187,15 +187,23 @@ namespace Chess
 
         public List<int> GetDestinationCoordinates()
         {
-            List<int> coords = new List<int> { model.DestinationY, model.DestinationX };
-            return coords;
+            return new List<int> { model.DestinationY, model.DestinationX };
         }
 
         public List<int> GetSourceCoordinates()
         {
-            List<int> coords = new List<int> { model.YSourceCoordinate, model.XSourceCoordinate };
-            return coords;
+            return new List<int> { model.YSourceCoordinate, model.XSourceCoordinate };
+            
         }
+        
+        public void GenerateLegalMoves()
+        {
+            MoveGenerator generate = new MoveGenerator();
+            generate.GeneratePseudoLegalMoves(model.InternalBoard, model.IsItBlackToMove);
+        }
+
+
+
 
         /*public Grid CreateGrid() // encapsulate code?
         {

@@ -11,6 +11,8 @@ namespace Chess.PieceFactory
     {
         public bool canDoubleMove = true;
         public bool canPassant = false;
+
+
         public override Piece CreatePiece()
         {
             return new Pawn();

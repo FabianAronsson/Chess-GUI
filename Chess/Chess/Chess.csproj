@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model.cs" />
+    <Compile Include="MoveGenerator.cs" />
     <Compile Include="PieceFactory\Bishop.cs" />
     <Compile Include="PieceFactory\EmptySquare.cs" />
     <Compile Include="PieceFactory\IPieceFactory.cs" />

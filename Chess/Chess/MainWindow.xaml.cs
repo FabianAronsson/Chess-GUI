@@ -46,9 +46,41 @@ namespace Chess
             {
                 controller.SaveCoordinates(Grid.GetRow(piece), Grid.GetColumn(piece));
                 //display legal moves
+                if (!controller.IsDestinationPieceSelected())
+                {
+                    DisplayLegalMoves(piece);
+                }
+                
                 CanPlayerMakeMove();
             }
+        }
 
+        //todo document method
+        private void DisplayLegalMoves(Piece piece)
+        {
+            List<string> legalMoves = piece.legalMoves;
+            string[] currentPosition = new string[2];
+            for (int i = 0; i < legalMoves.Count; i++)
+            {
+                currentPosition = legalMoves[i].Split(' ');
+                Piece pieceToUpdate = (Piece)Board.Children.Cast<UIElement>().First(pieceOnBoard
+                    => Grid.GetRow(pieceOnBoard) == int.Parse(currentPosition[0]) && Grid.GetColumn(pieceOnBoard) == int.Parse(currentPosition[1]));
+                pieceToUpdate.Background = Brushes.Red;
+            }
+
+        }
+        private void HideLegalMoves(Piece piece)
+        {
+            List<string> legalMoves = piece.legalMoves;
+            string[] currentPosition = new string[2];
+
+            for (int i = 0; i < legalMoves.Count; i++)
+            {
+                currentPosition = legalMoves[i].Split(' ');
+                Piece pieceToUpdate = (Piece)Board.Children.Cast<UIElement>().First(pieceOnBoard
+                    => Grid.GetRow(pieceOnBoard) == int.Parse(currentPosition[0]) && Grid.GetColumn(pieceOnBoard) == int.Parse(currentPosition[1]));
+                pieceToUpdate.Background = Brushes.Transparent;
+            }
         }
 
         private void CanPlayerMakeMove()
@@ -57,23 +89,25 @@ namespace Chess
             {
                 if (controller.IsMoveLegal()) //controller.IsMoveLegal()
                 {
+                    HideLegalMoves(controller.GetSourcePiece());
                     UpdateBoard(); //move piece
                     controller.ResetSelectedPieceValues();
                 }
-                else
+                else //user tried making an illegal move
                 {
                     controller.ResetSelectedPieceValues();
+                    HideLegalMoves(controller.GetSourcePiece());
                 }
+                
             }
         }
 
         //todo document method
         private void RemovePiece(List<int> coordinates)
         {
-            
-                var piece = Board.Children.Cast<UIElement>().First(pieceOnBoard
-                    => Grid.GetRow(pieceOnBoard) == coordinates[0] && Grid.GetColumn(pieceOnBoard) == coordinates[1]);
-            
+            var piece = Board.Children.Cast<UIElement>().First(pieceOnBoard
+                => Grid.GetRow(pieceOnBoard) == coordinates[0] && Grid.GetColumn(pieceOnBoard) == coordinates[1]);
+
             Grid.SetColumn(piece, coordinates[1]);
             Grid.SetRow(piece, coordinates[0]);
             Board.Children.Remove(piece);
@@ -84,18 +118,22 @@ namespace Chess
         {
             List<int> sourceCoordinates = controller.GetSourceCoordinates();
             List<int> destinationCoordinates = controller.GetDestinationCoordinates();
-            RemovePiece(sourceCoordinates); //remove source piece
-            RemovePiece(destinationCoordinates); //remove destination piece
+            if (sourceCoordinates != destinationCoordinates)
+            {
+                RemovePiece(sourceCoordinates); //remove source piece
+                RemovePiece(destinationCoordinates); //remove destination piece
 
-            var emptySquare = controller.CreatePiece('S', true);
-            emptySquare.Click += new RoutedEventHandler(GetPositionOfSquare);
+                var emptySquare = controller.CreatePiece('S', true);
+                emptySquare.Click += new RoutedEventHandler(GetPositionOfSquare);
 
-            //set pieces to board
-            SetPieceToBoard(sourceCoordinates, emptySquare);
-            SetPieceToBoard(destinationCoordinates, controller.GetSourcePiece());
+                //set pieces to board
+                SetPieceToBoard(sourceCoordinates, emptySquare);
+                SetPieceToBoard(destinationCoordinates, controller.GetSourcePiece());
 
-            //reflect the visual change to the internal board
-            controller.UpdateMovesOnBoard();
+                //reflect the visual change to the internal board
+                controller.UpdateMovesOnBoard();
+            }
+            
 
         }
 

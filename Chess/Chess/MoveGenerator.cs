@@ -97,14 +97,23 @@ namespace Chess
                     {
                         if (activeDirection + dirValue >= maxValue)
                         {
+                            //Checks whether or not the next square is a piece of the same color and if its a piece on the square
                             if (currentPiece.isBlack == board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare))
                             {
                                 break;
                             }
+                            //If not, then add that move to legal moves
                             else
                             {
                                 currentPiece.legalMoves.Add((tempY + yOffset) + " " + (tempX + xOffset));
                                 activeDirection += n;
+
+                                //If the next piece is of the opposite color, then stop searching for legal moves
+                                if (currentPiece.isBlack != board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare))
+                                {
+                                    break;
+                                }
+
                                 if (yOffset == 0)
                                 {
                                     xOffset += n;
@@ -136,6 +145,11 @@ namespace Chess
                                 currentPiece.legalMoves.Add((tempY + yOffset) + " " + (tempX + xOffset));
                                 activeDirection += n;
 
+                                if (currentPiece.isBlack != board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare))
+                                {
+                                    break;
+                                }
+
                                 if (yOffset == 0)
                                 {
                                     xOffset += n;
@@ -158,6 +172,7 @@ namespace Chess
             }
             return currentPiece;
         }
+
         private void GenerateBishopMoves(Piece currentPiece)
         {
 

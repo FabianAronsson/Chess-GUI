@@ -176,15 +176,17 @@ namespace Chess
             model.IsDestinationPieceSelected = false;
         }
 
-        public Piece GetSourcePiece()
-        {
-            return model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
-        }
+        
 
         public Piece CreatePiece(char typeOfPiece, bool isBlack)
         {
             PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
             return factory.CreatePiece(typeOfPiece, isBlack);
+        }
+
+        public Piece GetSourcePiece()
+        {
+            return model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
         }
 
         public List<int> GetDestinationCoordinates()
@@ -195,7 +197,6 @@ namespace Chess
         public List<int> GetSourceCoordinates()
         {
             return new List<int> { model.YSourceCoordinate, model.XSourceCoordinate };
-            
         }
         
         public void GenerateLegalMoves()
@@ -203,9 +204,6 @@ namespace Chess
             MoveGenerator generate = new MoveGenerator();
             generate.GeneratePseudoLegalMoves(model.InternalBoard, model.IsItBlackToMove);
         }
-
-
-
 
         /*public Grid CreateGrid() // encapsulate code?
         {

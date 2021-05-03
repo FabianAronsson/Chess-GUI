@@ -141,9 +141,11 @@ namespace Chess
         public bool IsMoveLegal()
         {
             Piece piece = model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
+            string destinationCoords = ConvertIntToString(model.DestinationY, model.DestinationX);
+
             for (int i = 0; i < piece.legalMoves.Count; i++)
             { //Needs more validation
-                if (piece.legalMoves[i] == ConvertIntToString(model.DestinationY, model.DestinationX))
+                if (piece.legalMoves[i] == destinationCoords)
                 {
                     return true;
                 }

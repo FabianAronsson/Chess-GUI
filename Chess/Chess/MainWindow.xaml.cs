@@ -62,7 +62,7 @@ namespace Chess
                 }
                 else
                 {
-                    //reset piece values
+                    controller.ResetSelectedPieceValues();
                 }
             }
         }
@@ -70,8 +70,10 @@ namespace Chess
         //todo document method
         private void RemovePiece(List<int> coordinates)
         {
-            var piece = Board.Children.Cast<UIElement>().First(pieceOnBoard
+            
+                var piece = Board.Children.Cast<UIElement>().First(pieceOnBoard
                     => Grid.GetRow(pieceOnBoard) == coordinates[0] && Grid.GetColumn(pieceOnBoard) == coordinates[1]);
+            
             Grid.SetColumn(piece, coordinates[1]);
             Grid.SetRow(piece, coordinates[0]);
             Board.Children.Remove(piece);

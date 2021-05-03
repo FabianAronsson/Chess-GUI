@@ -71,6 +71,7 @@ namespace Chess
                         dirValue = 1;
                         maxValue = 8;
                         n = 1;
+                        isPositiveOperation = true;
                         break;
                     case 2: //South
                         yOffset = 1;
@@ -85,6 +86,7 @@ namespace Chess
                         dirValue = -1;
                         maxValue = 0;
                         n = -1;
+                        isPositiveOperation = false;
                         break;
                     default:
                         break;
@@ -123,7 +125,7 @@ namespace Chess
                     }
                     else
                     {
-                        if (activeDirection + dirValue < maxValue)
+                        if (activeDirection + dirValue < maxValue && (xOffset >= 0 && yOffset >= 0))
                         {
                             if (currentPiece.isBlack == board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare)) //add error handling for negative integers
                             {

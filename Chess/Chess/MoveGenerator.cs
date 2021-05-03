@@ -33,6 +33,9 @@ namespace Chess
                         case "Queen":
                             board[i, j] = GenerateQueenMoves(currentPiece, i, j);
                             break;
+                        case "Knight":
+                            board[i, j] = GenerateKnightMoves(currentPiece, i, j);
+                            break;
                         default:
                             break;
                     }
@@ -182,8 +185,8 @@ namespace Chess
         }
 
 
-       //todo, document this monster of a method.
-       private Piece GenerateBishopMoves(Piece currentPiece, int y, int x)
+        //todo, document this monster of a method.
+        private Piece GenerateBishopMoves(Piece currentPiece, int y, int x)
         {
             //the values are set up looking at the northwestern way, afterwards it follows the switch statement in each direction for a bishop
             int tempY = y;
@@ -208,6 +211,7 @@ namespace Chess
             {
                 switch (i)
                 {
+                    //document what the numbers mean
                     case 1: //Northeast
                         yOffset = -1;
                         xOffset = 1;
@@ -256,7 +260,7 @@ namespace Chess
 
                 for (int j = 0; j < 8; j++)
                 {
-                    if (operationY((activeDirectionY + dirValueY),  maxValueY) && operationX((activeDirectionX + dirValueX), maxValueX))
+                    if (operationY(activeDirectionY + dirValueY, maxValueY) && operationX(activeDirectionX + dirValueX, maxValueX))
                     {
                         if (currentPiece.isBlack == board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare))
                         {
@@ -272,29 +276,109 @@ namespace Chess
                             {
                                 break;
                             }
-                                xOffset += nX;
-                                yOffset += nY;
+                            xOffset += nX;
+                            yOffset += nY;
                         }
-
-                    }
-                    else
-                    {
-                        tempY = y;
-                        tempX = x;
-                        break;
                     }
                 }
             }
             return currentPiece;
         }
-        
+
+        //todo, document this monster of a method.
+        private Piece GenerateKnightMoves(Piece currentPiece, int y, int x)
+        {
+            int tempY = y;
+            int tempX = x;
+            int yOffset = -2;
+            int xOffset = -1;
+            int maxValueY = -1;
+            int maxValueX = -1;
+            int newMaxValueY = -1;
+            int newMaxValueX = 8;
+            int nY = 1;
+            int nX = -1;
+            //delegates for choosing what operation to use
+            Func<int, int, bool> greaterThanDelegate = (a, b) => a > b;
+            Func<int, int, bool> lessThanDelegate = (a, b) => a < b;
+            var operationY = greaterThanDelegate;
+            var operationX = greaterThanDelegate;
+
+            var newOperationY = greaterThanDelegate;
+            var newOperationX = lessThanDelegate;
+            for (int i = 0; i < 4; i++)
+            {
+                switch (i)
+                {
+                    //document what the numbers mean
+                    case 1: //East
+                        yOffset = -1;
+                        xOffset = 2;
+                        maxValueY = -1;
+                        maxValueX = 8;
+                        newMaxValueY = 8;
+                        nY = -1;
+                        nX = 1;
+                        operationY = greaterThanDelegate;
+                        operationX = lessThanDelegate;
+                        newOperationY = lessThanDelegate;
+                        break;
+                    case 2: //South
+                        yOffset = 2;
+                        xOffset = -1;
+                        maxValueY = 8;
+                        maxValueX = -1;
+                        newMaxValueX = 8;
+                        nY = 1;
+                        nX = -1;
+                        operationY = lessThanDelegate;
+                        operationX = greaterThanDelegate;
+                        newOperationX = lessThanDelegate;
+                        break;
+                    case 3: //West
+                        yOffset = -1;
+                        xOffset = -2;
+                        maxValueY = -1;
+                        maxValueX = -1;
+                        newMaxValueY = 8;
+                        nY = -1;
+                        nX = 1;
+                        operationY = greaterThanDelegate;
+                        operationX = greaterThanDelegate;
+                        newOperationY = lessThanDelegate;
+                        break;
+                    default:
+                        break;
+                }
+
+                //document what this thing does
+                for (int j = 0; j < 2; j++)
+                {
+                    if ((operationY(tempY + yOffset, maxValueY) && operationX(tempX + xOffset, maxValueX)) && (tempY + yOffset > -1 && tempX + xOffset > -1))
+                    {
+                        if (!(currentPiece.isBlack == board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare)))
+                        {
+                            currentPiece.legalMoves.Add((tempY + yOffset) + " " + (tempX + xOffset));
+                        }
+                    }
+                    yOffset *= nY;
+                    xOffset *= nX;
+                    maxValueY = newMaxValueY;
+                    maxValueX = newMaxValueX;
+                    operationY = newOperationY;
+                    operationX = newOperationX;
+
+                }
+            }
+            return currentPiece;
+        }
 
         private void GeneratePawnMoves(Piece currentPiece)
         {
 
         }
 
-        private void GenerateKnightMoves(Piece currentPiece)
+        private void GenerateKingMoves(Piece currentPiece)
         {
 
         }

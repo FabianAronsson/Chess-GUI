@@ -28,8 +28,10 @@ namespace Chess
                             board[i, j] = GenerateRookMoves(currentPiece, i, j);
                             break;
                         case "Bishop":
+                            board[i, j] = GenerateBishopMoves(currentPiece, i, j);
                             break;
                         case "Queen":
+                            board[i, j] = GenerateQueenMoves(currentPiece, i, j);
                             break;
                         default:
                             break;
@@ -40,9 +42,16 @@ namespace Chess
             return board;
         }
 
-        private void GenerateQueenMoves(Piece currentPiece)
+        private Piece GenerateQueenMoves(Piece currentPiece, int y, int x)
         {
+            List<string> legalMoves = new List<string>();
 
+            //since a queen is just a bishop and a rook combinded, their respective methods can be used to generate pseudo-legal moves
+            legalMoves.AddRange(GenerateRookMoves(currentPiece, y, x).legalMoves);
+            legalMoves.AddRange(GenerateBishopMoves(currentPiece, y, x).legalMoves);
+
+            currentPiece.legalMoves = legalMoves;
+            return currentPiece;
         }
 
         //todo, document this monster of a method.
@@ -58,7 +67,6 @@ namespace Chess
             int maxValue = 0;
             int dirValue = -1;
             int n = -1;
-
 
             for (int i = 0; i < 4; i++)
             {
@@ -108,7 +116,7 @@ namespace Chess
                                 currentPiece.legalMoves.Add((tempY + yOffset) + " " + (tempX + xOffset));
                                 activeDirection += n;
 
-                                //If the next piece is of the opposite color, then stop searching for legal moves
+                                //If the next position is a piece, then no more moves can be generated for that direction.
                                 if (currentPiece.isBlack != board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare))
                                 {
                                     break;
@@ -173,15 +181,113 @@ namespace Chess
             return currentPiece;
         }
 
-        private void GenerateBishopMoves(Piece currentPiece)
+
+       //todo, document this monster of a method.
+       private Piece GenerateBishopMoves(Piece currentPiece, int y, int x)
         {
+            //the values are set up looking at the northwestern way, afterwards it follows the switch statement in each direction for a bishop
+            int tempY = y;
+            int tempX = x;
+            int yOffset = -1;
+            int xOffset = -1;
+            int activeDirectionY = tempY;
+            int activeDirectionX = tempX;
+            int maxValueX = -1;
+            int maxValueY = -1;
+            int dirValueY = -1;
+            int dirValueX = -1;
+            int nY = -1;
+            int nX = -1;
+            //delegates for choosing what operation to use
+            Func<int, int, bool> greaterThanDelegate = (a, b) => a > b;
+            Func<int, int, bool> lessThanDelegate = (a, b) => a < b;
+            var operationY = greaterThanDelegate;
+            var operationX = greaterThanDelegate;
 
+            for (int i = 0; i < 4; i++)
+            {
+                switch (i)
+                {
+                    case 1: //Northeast
+                        yOffset = -1;
+                        xOffset = 1;
+                        activeDirectionY = y;
+                        activeDirectionX = x;
+                        dirValueY = -1;
+                        dirValueX = 1;
+                        maxValueY = -1;
+                        maxValueX = 8;
+                        nY = -1;
+                        nX = 1;
+                        operationY = greaterThanDelegate;
+                        operationX = lessThanDelegate;
+                        break;
+                    case 2: //Southeast
+                        yOffset = 1;
+                        xOffset = 1;
+                        activeDirectionY = y;
+                        activeDirectionX = x;
+                        dirValueY = 1;
+                        dirValueX = 1;
+                        maxValueY = 8;
+                        maxValueX = 8;
+                        nY = 1;
+                        nX = 1;
+                        operationY = lessThanDelegate;
+                        operationX = lessThanDelegate;
+                        break;
+                    case 3: //Southwest
+                        yOffset = 1;
+                        xOffset = -1;
+                        activeDirectionY = y;
+                        activeDirectionX = x;
+                        dirValueY = 1;
+                        dirValueX = -1;
+                        maxValueY = 8;
+                        maxValueX = -1;
+                        nY = 1;
+                        nX = -1;
+                        operationY = lessThanDelegate;
+                        operationX = greaterThanDelegate;
+                        break;
+                    default:
+                        break;
+                }
+
+                for (int j = 0; j < 8; j++)
+                {
+                    if (operationY((activeDirectionY + dirValueY),  maxValueY) && operationX((activeDirectionX + dirValueX), maxValueX))
+                    {
+                        if (currentPiece.isBlack == board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            currentPiece.legalMoves.Add((tempY + yOffset) + " " + (tempX + xOffset));
+                            activeDirectionY += nY;
+                            activeDirectionX += nX;
+
+                            if (currentPiece.isBlack != board[tempY + yOffset, tempX + xOffset].isBlack && !(board[tempY + yOffset, tempX + xOffset] is EmptySquare))
+                            {
+                                break;
+                            }
+                                xOffset += nX;
+                                yOffset += nY;
+                        }
+
+                    }
+                    else
+                    {
+                        tempY = y;
+                        tempX = x;
+                        break;
+                    }
+                }
+            }
+            return currentPiece;
         }
-
-        private void GenerateKingMoves(Piece currentPiece)
-        {
-
-        }
+        
 
         private void GeneratePawnMoves(Piece currentPiece)
         {

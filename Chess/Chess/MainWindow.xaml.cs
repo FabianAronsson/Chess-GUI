@@ -69,6 +69,8 @@ namespace Chess
             }
 
         }
+
+        //todo document method
         private void HideLegalMoves(Piece piece)
         {
             List<string> legalMoves = piece.legalMoves;

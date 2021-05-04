@@ -367,12 +367,13 @@ namespace Chess
             return currentPiece;
         }
 
+        //todo, document this monster of a method.
         private Piece GeneratePawnMoves(Piece currentPiece, int y, int x, List<int> enPassantCoordinate)
         {
             Pawn pawn = currentPiece as Pawn;
+            //Assuming it is a black pawn those values are set, otherwise it is set to white on line 389.
             var move = new MoveModel(pawn, y, x, true);
 
-            
             bool isDiagonalMove = false;
 
             //delegates for choosing what operation to use
@@ -384,6 +385,7 @@ namespace Chess
             var newOperationX = greaterThanDelegate;
             var newOppositeOperationX = lessThanDelegate;
 
+            //set position specific values for white
             if (!currentPiece.isBlack)
             {
                 move = new MoveModel(pawn, y, x, false);
@@ -404,6 +406,7 @@ namespace Chess
                         //If not, then add that move to legal moves
                         else
                         {
+                            //Check moves that goes either up or down depending on color.
                             if (!isDiagonalMove)
                             {
                                 //If the next position is a piece, then no more moves can be generated for that direction.
@@ -411,23 +414,26 @@ namespace Chess
                                 {
                                     break;
                                 }
+                                //check if pawn can do double moves
                                 if (pawn.canDoubleMove && move.CanDoubleMove && j == 1)
                                 {
                                     currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                                     move.CanDoubleMove = false;
                                     break;
                                 }
-                                else if (j == 1) 
+                                //If the pawn cannot do a double move then that means the pawn cannot move any further. If j == 1 then that
+                                //means the pawn is on its last possible move, if no double move is possible, then no more legal moves forward are possible.
+                                else if (j == 1)
                                 {
                                     break;
                                 }
                                 currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
+                                move.YOffset += move.NY;
+                                move.ActiveDirectionY += move.NY;
                             }
-                            
-
-                            //If the next position for a diagonal move is a piece, then capture that piece.
-                            if (isDiagonalMove)
+                            else
                             {
+                                //If the next position for a diagonal move is a piece of the opposite color, add it to the list of legalmoves.
                                 if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                                 {
                                     currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
@@ -437,21 +443,29 @@ namespace Chess
                                 {
                                     currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                                 }
+
+                                //set new values specific to diagonal moves
                                 move.MaxValueX = move.NewMaxValueX;
-                                if (j == 1)
-                                {
-                                    operationX = newOperationX;
-                                }
+                                operationX = newOppositeOperationX;
                                 move.XOffset *= move.NX;
+                                move.DirValueX *= move.NX;
                             }
 
-                            move.ActiveDirectionY += move.NY;
-
-                            move.YOffset += move.NY;
                         }
                     }
                     else
                     {
+                        //Normally the loop "breaks" when the index is out of bounds, however for diagonal
+                        //moves it is neccessary to check for the additional attacking square pawns can move to
+                        if (isDiagonalMove)
+                        {
+                            move.MaxValueX = move.NewMaxValueX;
+                            operationX = newOppositeOperationX;
+                            move.XOffset *= move.NX;
+                            move.DirValueX *= move.NX;
+                            continue;
+                        }
+
                         move.TempY = y;
                         move.TempX = x;
                         break;
@@ -460,8 +474,9 @@ namespace Chess
                 isDiagonalMove = true;
                 if (currentPiece.isBlack)
                 {
+                    //set new values for black pawns
                     move.YOffset = 1;
-                    move.XOffset = 1;
+                    move.XOffset = -1;
                     move.MaxValueX = -1;
                     move.NewMaxValueX = 8;
                     move.DirValueX = -1;
@@ -473,13 +488,14 @@ namespace Chess
                 }
                 else
                 {
+                    //set new values for white pawns
                     move.YOffset = -1;
                     move.XOffset = -1;
                     move.MaxValueX = -1;
                     move.NewMaxValueX = 8;
                     move.DirValueX = -1;
                     move.NY = 1;
-                    move.NX = 1;
+                    move.NX = -1;
                     move.ActiveDirectionY = y;
                     move.ActiveDirectionX = x;
                     operationX = newOperationX;

@@ -66,6 +66,7 @@ namespace Chess
                 Piece pieceToUpdate = (Piece)Board.Children.Cast<UIElement>().First(pieceOnBoard
                     => Grid.GetRow(pieceOnBoard) == int.Parse(currentPosition[0]) && Grid.GetColumn(pieceOnBoard) == int.Parse(currentPosition[1]));
                 pieceToUpdate.Background = Brushes.Red;
+
             }
 
         }
@@ -94,6 +95,7 @@ namespace Chess
                     HideLegalMoves(controller.GetSourcePiece());
                     UpdateBoard(); //move piece
                     controller.ResetSelectedPieceValues();
+                    controller.GenerateLegalMoves();
                 }
                 else //user tried making an illegal move
                 {

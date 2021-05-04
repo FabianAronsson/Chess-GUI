@@ -12,7 +12,7 @@ namespace Chess
 {
     public class Controller
     {
-        public Model model; 
+        private Model model; 
 
         private Controller()
         {
@@ -145,9 +145,24 @@ namespace Chess
 
             for (int i = 0; i < piece.legalMoves.Count; i++)
             { //Needs more validation
+
+                
                 if (piece.legalMoves[i] == destinationCoords)
                 {
+                    //special cases for pawns
+                    if (piece is Pawn pawn)
+                    {
+                        pawn.canDoubleMove = false;
+                        //if the delta of destination coordinate and source coordinate equals 2, then the move made was a double move. Save the coordinate behind the pawn as an en passant square
+                        if (model.DestinationY - model.YSourceCoordinate == 2)
+                        {
+                            
+                            model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate] = pawn;
+                        }
+                    }
                     return true;
+
+                    //if pawn moved two steps, calculate the delta to see if it was a two step, then add the square before the new position to en passant square.
                 }
             }
             return false;
@@ -187,6 +202,7 @@ namespace Chess
         public Piece GetSourcePiece()
         {
             return model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
+            
         }
 
         public List<int> GetDestinationCoordinates()
@@ -202,7 +218,7 @@ namespace Chess
         public void GenerateLegalMoves()
         {
             MoveGenerator generate = new MoveGenerator();
-            generate.GeneratePseudoLegalMoves(model.InternalBoard, model.IsItBlackToMove);
+            generate.GeneratePseudoLegalMoves(model.InternalBoard, model.IsItBlackToMove, model.EnPassantCoordinate);
         }
 
         /*public Grid CreateGrid() // encapsulate code?

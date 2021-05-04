@@ -42,7 +42,7 @@ namespace Chess
         }
         
         //standard setup for chess, can be substituted for any position
-        private string FEN = "8/8/2n2n2/8/8/2N2N2/8/8 w - - 0 1";
+        private string FEN = "8/1P1pp1p1/8/8/8/8/1P3P2/8 w - - 0 1";
 
         public string FENotation
         {
@@ -89,6 +89,15 @@ namespace Chess
             get { return destinationPiece; }
             set { destinationPiece = value; }
         }
+
+        private List<int> enPassantSquare = new List<int> { 0, 0 };
+
+        public List<int> EnPassantCoordinate
+        {
+            get { return enPassantSquare; }
+            set { enPassantSquare = value; }
+        }
+
 
 
     }

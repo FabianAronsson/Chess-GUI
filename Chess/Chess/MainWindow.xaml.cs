@@ -94,27 +94,16 @@ namespace Chess
                 {
                     HideLegalMoves(controller.GetSourcePiece());
                     UpdateBoard(); //move piece
-                    controller.ResetSelectedPieceValues();
+                    controller.ResetPieceValues();
                     controller.GenerateLegalMoves();
                 }
                 else //user tried making an illegal move
                 {
-                    controller.ResetSelectedPieceValues();
+                    controller.ResetPieceValues();
                     HideLegalMoves(controller.GetSourcePiece());
                 }
                 
             }
-        }
-
-        //todo document method
-        private void RemovePiece(List<int> coordinates)
-        {
-            var piece = Board.Children.Cast<UIElement>().First(pieceOnBoard
-                => Grid.GetRow(pieceOnBoard) == coordinates[0] && Grid.GetColumn(pieceOnBoard) == coordinates[1]);
-
-            Grid.SetColumn(piece, coordinates[1]);
-            Grid.SetRow(piece, coordinates[0]);
-            Board.Children.Remove(piece);
         }
 
         //todo document method
@@ -124,6 +113,43 @@ namespace Chess
             List<int> destinationCoordinates = controller.GetDestinationCoordinates();
             if (sourceCoordinates != destinationCoordinates)
             {
+
+                //REFACTOR INTO OWN METHOD
+                List<int> specialCaseCoordinates = controller.GetSpecialCaseCoordinates();
+                if (specialCaseCoordinates[0] != 9) //ARBITRARY NUMBER, does not matter what number it is, as long as it is not a number used by the board.
+                {
+                    if (specialCaseCoordinates.Count == 2)
+                    {
+                        RemovePiece(specialCaseCoordinates);
+                        SetPieceToBoard(specialCaseCoordinates, controller.CreatePiece('S', true));
+                    }
+                    else if(specialCaseCoordinates.Count == 4)
+                    {
+                        List<int> sourcePieceCoordinates = new List<int> { specialCaseCoordinates[0], specialCaseCoordinates[1] };
+                        List<int> destinationPieceCoordinates = new List<int> { specialCaseCoordinates[2], specialCaseCoordinates[3] };
+                        RemovePiece(sourcePieceCoordinates);
+                        RemovePiece(destinationPieceCoordinates);
+
+                        var square = controller.CreatePiece('S', true);
+                        square.Click += new RoutedEventHandler(GetPositionOfSquare);
+                        SetPieceToBoard(sourcePieceCoordinates, square);
+                        char type = ' ';
+                        bool isBlack = true;
+                        if (controller.IsPieceBlack(destinationPieceCoordinates)) //GET SPECIFIC PIECE, DO NOT CREATE A NEW ONE, THIS IS TO GET ALL LEGAL MOVES
+                        {
+                            type = 'r';
+                        }
+                        else
+                        {
+                            type = 'R';
+                            isBlack = true;
+                        }
+                        var newPiece = controller.CreatePiece(type, isBlack);
+                        newPiece.Click += new RoutedEventHandler(MovePiece);
+                        SetPieceToBoard(destinationPieceCoordinates, newPiece);
+                    }
+                }
+                
                 RemovePiece(sourceCoordinates); //remove source piece
                 RemovePiece(destinationCoordinates); //remove destination piece
 
@@ -137,8 +163,17 @@ namespace Chess
                 //reflect the visual change to the internal board
                 controller.UpdateMovesOnBoard();
             }
-            
+        }
 
+        //todo document method
+        private void RemovePiece(List<int> coordinates)
+        {
+            var piece = Board.Children.Cast<UIElement>().First(pieceOnBoard
+                => Grid.GetRow(pieceOnBoard) == coordinates[0] && Grid.GetColumn(pieceOnBoard) == coordinates[1]);
+
+            Grid.SetColumn(piece, coordinates[1]);
+            Grid.SetRow(piece, coordinates[0]);
+            Board.Children.Remove(piece);
         }
 
         private void SetPieceToBoard(List<int> coordinates, Piece piece)

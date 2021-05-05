@@ -42,7 +42,7 @@ namespace Chess
         }
         
         //standard setup for chess, can be substituted for any position
-        private string FEN = "pppppppp/PPPPPPPP/8/8/8/8/pppppp2/PPPPPP2 w - - 0 1";
+        private string FEN = "r3k2r/8/8/8/8/8/8/7K b q - 0 1";
 
         public string FENotation
         {
@@ -90,7 +90,7 @@ namespace Chess
             set { destinationPiece = value; }
         }
 
-        private List<int> enPassantSquare = new List<int> { 7, 7 }; //remember to uncheck this field when testing
+        private List<int> enPassantSquare = new List<int> { 7, 7}; //DEBUG COORDINATES
 
         public List<int> EnPassantCoordinate
         {
@@ -98,7 +98,12 @@ namespace Chess
             set { enPassantSquare = value; }
         }
 
+        private List<int> specialCaseCoordinates = new List<int> { 9, 9 };
 
-
+        public List<int> SpecialCaseCoordinates
+        {
+            get { return specialCaseCoordinates; }
+            set { specialCaseCoordinates = value; }
+        }
     }
 }

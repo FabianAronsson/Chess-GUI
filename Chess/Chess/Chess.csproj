@@ -125,5 +125,9 @@
   <ItemGroup>
     <Resource Include="Images\wKing.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Sound\Capture.wav" />
+    <None Include="Sound\Move.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

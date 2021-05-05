@@ -9,8 +9,8 @@ namespace Chess
 {
     public class MoveGenerator
     {
-        Piece[,] board;
-        bool isBlackToMove;
+        private Piece[,] board;
+        private bool isBlackToMove;
 
         public Piece[,] GeneratePseudoLegalMoves(Piece[,] board, bool isBlackToMove, List<int> enPassantSquare) //board is binded to Internalboard.
         {
@@ -26,10 +26,10 @@ namespace Chess
                     switch (board[i, j].typeOfPiece)
                     {
                         case "Rook":
-                            board[i, j] = GenerateRookMoves(currentPiece, i, j);
+                            board[i, j] = GenerateLateralMoves(currentPiece, i, j, 7);
                             break;
                         case "Bishop":
-                            board[i, j] = GenerateBishopMoves(currentPiece, i, j);
+                            board[i, j] = GenerateDiagonalMoves(currentPiece, i, j, 7);
                             break;
                         case "Queen":
                             board[i, j] = GenerateQueenMoves(currentPiece, i, j);
@@ -43,6 +43,21 @@ namespace Chess
                         default:
                             break;
                     }
+                }
+            }
+
+
+            this.board = board;
+
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    var currentPiece = board[i, j];
+                    if(board[i, j].typeOfPiece.Equals("King")){
+                        board[i, j] = GenerateKingMoves(currentPiece, i, j);
+                    }     
                 }
             }
 
@@ -66,20 +81,18 @@ namespace Chess
             List<string> legalMoves = new List<string>();
 
             //since a queen is just a bishop and a rook combinded, their respective methods can be used to generate pseudo-legal moves
-            legalMoves.AddRange(GenerateRookMoves(currentPiece, y, x).legalMoves);
-            legalMoves.AddRange(GenerateBishopMoves(currentPiece, y, x).legalMoves);
+            legalMoves.AddRange(GenerateLateralMoves(currentPiece, y, x, 7).legalMoves);
+            legalMoves.AddRange(GenerateDiagonalMoves(currentPiece, y, x, 7).legalMoves);
 
             currentPiece.legalMoves = legalMoves;
             return currentPiece;
         }
 
         //todo, document this monster of a method.
-        private Piece GenerateRookMoves(Piece currentPiece, int y, int x)
+        private Piece GenerateLateralMoves(Piece currentPiece, int y, int x, int maxLoopValue)
         {
             Rook rook = currentPiece as Rook;
             var move = new MoveModel(rook, y, x);
-
-
 
             for (int i = 0; i < 4; i++)
             {
@@ -112,7 +125,7 @@ namespace Chess
                     default:
                         break;
                 }
-                for (int j = 0; j < 7; j++)
+                for (int j = 0; j < maxLoopValue; j++)
                 {
                     if (!move.IsPositiveOperation)
                     {
@@ -194,11 +207,9 @@ namespace Chess
             return currentPiece;
         }
 
-
         //todo, document this monster of a method.
-        private Piece GenerateBishopMoves(Piece currentPiece, int y, int x)
+        private Piece GenerateDiagonalMoves(Piece currentPiece, int y, int x, int maxLoopValue)
         {
-
             Bishop bishop = currentPiece as Bishop;
             var move = new MoveModel(bishop, y, x);
 
@@ -259,7 +270,7 @@ namespace Chess
                         break;
                 }
 
-                for (int j = 0; j < 8; j++)
+                for (int j = 0; j < maxLoopValue; j++)
                 {
                     if (operationY(move.ActiveDirectionY + move.DirValueY, move.MaxValueY) && operationX(move.ActiveDirectionX + move.DirValueX, move.MaxValueX))
                     {
@@ -414,13 +425,18 @@ namespace Chess
                                 {
                                     break;
                                 }
-                                //check if pawn can do double moves
-                                if (pawn.canDoubleMove && move.CanDoubleMove && j == 1)
+                                //Check if pawn can do double move
+                                if (y == 1 || y == 6)
                                 {
-                                    currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
-                                    move.CanDoubleMove = false;
-                                    break;
+                                    if (pawn.canDoubleMove && move.CanDoubleMove && j == 1)
+                                    {
+                                        currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
+                                        move.CanDoubleMove = false;
+                                        break;
+                                    }
+
                                 }
+                                
                                 //If the pawn cannot do a double move then that means the pawn cannot move any further. If j == 1 then that
                                 //means the pawn is on its last possible move, if no double move is possible, then no more legal moves forward are possible.
                                 else if (j == 1)
@@ -501,12 +517,134 @@ namespace Chess
                     operationX = newOperationX;
                 }
             }
-            return pawn;
+            return currentPiece; // check so it is working, was "pawn" before.
         }
 
-        private void GenerateKingMoves(Piece currentPiece)
+        private Piece GenerateKingMoves(Piece currentPiece, int y, int x)
         {
+            List<string> kingMoves = GenerateLateralKingMoves(currentPiece, y, x);
+            kingMoves.AddRange(GenerateDiagonalKingMoves(currentPiece, y, x));
+            kingMoves.AddRange(GetKingCastleCoordinates(currentPiece, y, x));
+            kingMoves = kingMoves.Distinct().ToList(); //due to a "bug" with "AddRange", duplicate values were assigned, creating a need for distinct values
 
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (!board[i, j].typeOfPiece.Equals("King"))
+                    {
+                        if (!(board[i, j] is EmptySquare))
+                        {
+                            var selectedPiece = board[i, j];
+                            if (currentPiece.isBlack != board[i, j].isBlack)
+                            {
+                                kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);
+                                
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+            currentPiece.legalMoves = kingMoves;
+
+
+
+            return currentPiece;
+        }
+
+        private List<string> GetKingCastleCoordinates(Piece currentPiece, int y, int x)
+        {
+            King king = currentPiece as King;
+            List<string> castleCoordinates = new List<string>(2);
+            if (king.isBlack)
+            {
+                if (y == 0 && x == 4)
+                {
+                    if (board[0, x + 1] is EmptySquare && board[0, x + 2] is EmptySquare)
+                    {
+                        if (king.canCastleK)
+                        {
+                            castleCoordinates.Add("0 6");
+                        }
+                    }
+
+                    if (board[0, x - 1] is EmptySquare && board[0, x - 2] is EmptySquare)
+                    {
+                        if (king.canCastleQ)
+                        {
+                            castleCoordinates.Add("0 2");
+                        }
+                    }
+                    
+                }
+            }
+            else
+            {
+                if (y == 7 && x == 4)
+                {
+                    if (board[7, x + 1] is EmptySquare && board[7, x + 2] is EmptySquare)
+                    {
+                        if (king.canCastleK)
+                        {
+                            castleCoordinates.Add("7 6");
+                        }
+                    }
+
+                    if (board[7, x - 1] is EmptySquare && board[7, x + 2] is EmptySquare)
+                    {
+                        if (king.canCastleQ)
+                        {
+                            castleCoordinates.Add("7 2");
+                        }
+                    }
+                }
+            }
+
+            return castleCoordinates;
+        }
+
+        private List<string> RemoveIllegalSquaresForKing(List<string> kingMoves, Piece selectedPiece)
+        {
+            List<string> coordinatesToBeDeleted = new List<string>(kingMoves.Count);
+            for (int i = 0; i < kingMoves.Count; i++)
+            {
+                string kingmove = kingMoves[i];
+                for (int j = 0; j < selectedPiece.legalMoves.Count; j++)
+                {
+                    if (kingmove.Equals(selectedPiece.legalMoves[j]))
+                    {
+                        coordinatesToBeDeleted.Add(kingmove);
+                        break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < coordinatesToBeDeleted.Count; i++)
+            {
+                kingMoves.Remove(coordinatesToBeDeleted[i]);
+            }
+            
+            return kingMoves;
+        }
+
+        private List<string> GenerateLateralKingMoves(Piece currentPiece, int y, int x)
+        {
+            List<string> legalMoves = new List<string>();
+            legalMoves.AddRange(GenerateLateralMoves(currentPiece, y, x, 1).legalMoves);
+
+            return legalMoves;
+        }
+
+        private List<string> GenerateDiagonalKingMoves(Piece currentPiece, int y, int x)
+        {
+            List<string> legalMoves = new List<string>();
+            legalMoves.AddRange(GenerateDiagonalMoves(currentPiece, y, x, 1).legalMoves);
+
+            return legalMoves;
         }
     }
 }

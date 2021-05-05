@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("piecefactory/bishop.cs")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("sound/move.wav")]
 
 

@@ -149,23 +149,101 @@ namespace Chess
                 
                 if (piece.legalMoves[i] == destinationCoords)
                 {
-                    //special cases for pawns
+                    //Special cases for pawns
                     if (piece is Pawn pawn)
                     {
                         pawn.canDoubleMove = false;
-                        //if the delta of destination coordinate and source coordinate equals 2, then the move made was a double move. Save the coordinate behind the pawn as an en passant square
-                        if (model.DestinationY - model.YSourceCoordinate == 2)
-                        {
-                            
-                            model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate] = pawn;
-                        }
+                        SetSpecialPawnProperties(pawn, pawn.legalMoves[i]);
                     }
+                    //Special cases for kings
+                    else if (piece is King king)
+                    {
+                        
+                        SetSpecialKingProperties(king, king.legalMoves[i], destinationCoords);
+                        king.canCastleK = false;
+                        king.canCastleQ = false;
+                    }
+
+                    
+
+                    
                     return true;
 
-                    //if pawn moved two steps, calculate the delta to see if it was a two step, then add the square before the new position to en passant square.
+                    
                 }
             }
             return false;
+        }
+
+        private void SetSpecialKingProperties(King king, string currentLegalMove, string destinationCoordinates)
+        {
+            if (king.isBlack)
+            {
+                if (king.canCastleK)
+                {
+                    if (currentLegalMove.Equals(0 + " " + 6))
+                    {
+                        model.SpecialCaseCoordinates[0] = 0;
+                        model.SpecialCaseCoordinates[1] = 7;
+
+                        model.InternalBoard[0, 7] = CreatePiece('S', true);
+
+                        model.SpecialCaseCoordinates.Add(0);
+                        model.SpecialCaseCoordinates.Add(5);
+
+                        model.InternalBoard[0, 5] = CreatePiece('r', true);
+                    }
+                    
+                }
+                
+                if(king.canCastleQ)
+                {
+                    if (currentLegalMove.Equals(0 + " " + 2))
+                    {
+                        model.SpecialCaseCoordinates[0] = 0;
+                        model.SpecialCaseCoordinates[1] = 0;
+
+                        model.InternalBoard[0, 0] = CreatePiece('S', true);
+
+                        model.SpecialCaseCoordinates.Add(0);
+                        model.SpecialCaseCoordinates.Add(3);
+
+                        model.InternalBoard[0, 3] = CreatePiece('r', true);
+                    }
+                }
+            }
+            else
+            {
+
+            }
+        }
+
+        private void SetSpecialPawnProperties(Pawn pawn, string currentLegalMove)
+        {
+            //if the delta of destination coordinate and source coordinate equals 2, then the move made was a double move. The coordinate behind the pawn is then saved as an eligible en passant square
+            if (model.DestinationY - model.YSourceCoordinate == 2)
+            {
+                model.EnPassantCoordinate[0] = model.YSourceCoordinate + 1;
+                model.EnPassantCoordinate[1] = model.XSourceCoordinate;
+            }
+            else if (model.YSourceCoordinate - model.DestinationY == 2)
+            {
+                model.EnPassantCoordinate[0] = model.YSourceCoordinate - 1;
+                model.EnPassantCoordinate[1] = model.XSourceCoordinate;
+            }
+            if (currentLegalMove.Equals(model.EnPassantCoordinate[0] + " " + model.EnPassantCoordinate[1]))
+            {
+                if (pawn.isBlack)
+                {
+                    model.SpecialCaseCoordinates[0] = model.EnPassantCoordinate[0] - 1;
+                    model.SpecialCaseCoordinates[1] = model.EnPassantCoordinate[1];
+                }
+                else
+                {
+                    model.SpecialCaseCoordinates[0] = model.EnPassantCoordinate[0] + 1;
+                    model.SpecialCaseCoordinates[1] = model.EnPassantCoordinate[1];
+                }
+            }
         }
 
         public string ConvertIntToString(int y, int x)
@@ -185,10 +263,26 @@ namespace Chess
 
         }
 
-        public void ResetSelectedPieceValues()
+        public void ResetPieceValues()
         {
             model.IsPieceSelected = false;
             model.IsDestinationPieceSelected = false;
+            model.EnPassantCoordinate[0] = 7;
+            model.EnPassantCoordinate[1] = 7;
+            model.SpecialCaseCoordinates = new List<int> { 9, 9 };
+
+        }
+
+        public bool IsPieceBlack(List<int> coordinates)
+        {
+            if (model.InternalBoard[coordinates[0], coordinates[1]].isBlack)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         
@@ -221,6 +315,13 @@ namespace Chess
             generate.GeneratePseudoLegalMoves(model.InternalBoard, model.IsItBlackToMove, model.EnPassantCoordinate);
         }
 
+        public List<int> GetSpecialCaseCoordinates()
+        {
+            return model.SpecialCaseCoordinates;
+            
+        }
+
+        
         /*public Grid CreateGrid() // encapsulate code?
         {
             Grid board = new Grid

@@ -541,9 +541,7 @@ namespace Chess
                             var selectedPiece = board[i, j]; 
                             if (currentPiece.isBlack != board[i, j].isBlack)
                             {
-                                //CHECK FOR CASTLING COORDINATES BUG BUG BUG
-                                kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);
-                                
+                                kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);   
                             }
                         }
                     }
@@ -621,6 +619,12 @@ namespace Chess
                     if (kingmove.Equals(selectedPiece.legalMoves[j]))
                     {
                         coordinatesToBeDeleted.Add(kingmove);
+
+                        if (kingmove.Equals(0 + " " + 5) || kingmove.Equals(0 + " " + 3) || kingmove.Equals(7 + " " + 5) || kingmove.Equals(7 + " " + 3))
+                        {
+                            coordinatesToBeDeleted.Add(CheckCastlingSquares(kingmove));
+                        }
+                        
                         break;
                     }
                 }
@@ -632,6 +636,26 @@ namespace Chess
             }
             
             return kingMoves;
+        }
+
+        public string CheckCastlingSquares(string castlingSquare)
+        {
+            if (castlingSquare.Equals(0 + " " + 5))
+            {
+                return 0 + " " + 6;
+            }
+            else if(castlingSquare.Equals(0 + " " + 3))
+            {
+                return 0 + " " + 2;
+            }
+            else if (castlingSquare.Equals(7 + " " + 5))
+            {
+                return 7 + " " + 6;
+            }
+            else
+            {
+                return 7 + " " + 2;
+            }
         }
 
         private List<string> GenerateLateralKingMoves(Piece currentPiece, int y, int x)

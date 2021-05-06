@@ -94,8 +94,9 @@ namespace Chess
                 {
                     HideLegalMoves(controller.GetSourcePiece());
                     UpdateBoard(); //move piece
+                    
+                    controller.GenerateLegalMoves(); 
                     controller.ResetPieceValues();
-                    controller.GenerateLegalMoves();
                 }
                 else //user tried making an illegal move
                 {
@@ -134,12 +135,13 @@ namespace Chess
         private void SetSpecialCaseVisuals()
         {
             List<int> specialCaseCoordinates = controller.GetSpecialCaseCoordinates();
-            if (specialCaseCoordinates[0] != 9) //ARBITRARY NUMBER, does not matter what number it is, as long as it is not a number used by the board.
+            if (specialCaseCoordinates[0] != 9) //ARBITRARY NUMBERS, does not matter what number it is, as long as it is not a number used by the board.
             {
                 if (specialCaseCoordinates.Count == 2)
                 {
                     RemovePiece(specialCaseCoordinates);
                     SetPieceToBoard(specialCaseCoordinates, controller.CreatePiece('S', true));
+                    controller.ResetSpecialValues();
                 }
                 else if (specialCaseCoordinates.Count == 4)
                 {

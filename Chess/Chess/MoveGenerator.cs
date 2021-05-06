@@ -525,7 +525,9 @@ namespace Chess
             List<string> kingMoves = GenerateLateralKingMoves(currentPiece, y, x);
             kingMoves.AddRange(GenerateDiagonalKingMoves(currentPiece, y, x));
             kingMoves.AddRange(GetKingCastleCoordinates(currentPiece, y, x));
-            kingMoves = kingMoves.Distinct().ToList(); //due to a "bug" with "AddRange", duplicate values were assigned, creating a need for distinct values
+
+            //due to a "bug" with "AddRange", duplicate values were assigned, creating a need for distinct values
+            kingMoves = kingMoves.Distinct().ToList(); 
 
 
             for (int i = 0; i < 8; i++)

@@ -299,6 +299,7 @@ namespace Chess
             {
                 model.EnPassantCoordinate[0] = model.YSourceCoordinate + 1;
                 model.EnPassantCoordinate[1] = model.XSourceCoordinate;
+                
             }
             else if (model.YSourceCoordinate - model.DestinationY == 2)
             {
@@ -318,6 +319,12 @@ namespace Chess
                     model.SpecialCaseCoordinates[1] = model.EnPassantCoordinate[1];
                 }
             }
+        }
+
+        public void ResetSpecialValues()
+        {
+            model.EnPassantCoordinate[0] = 9;
+            model.EnPassantCoordinate[1] = 9;
         }
 
         public string ConvertIntToString(int y, int x)
@@ -341,8 +348,6 @@ namespace Chess
         {
             model.IsPieceSelected = false;
             model.IsDestinationPieceSelected = false;
-            model.EnPassantCoordinate[0] = 7;
-            model.EnPassantCoordinate[1] = 7;
             model.SpecialCaseCoordinates = new List<int> { 9, 9 };
 
         }

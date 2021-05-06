@@ -33,7 +33,7 @@
             </Grid.Background>
         </Grid>
 
-        <Popup Name="MyPopup"
+        <Popup Name="PromotionPopup"
 
                Placement="Mouse"
 

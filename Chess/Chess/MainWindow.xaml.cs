@@ -170,7 +170,7 @@ namespace Chess
 
         private void ShowPopup()
         {
-            MyPopup.IsOpen = true;
+            PromotionPopup.IsOpen = true;
             viewmodel.RunEventHandler = false;
         }
 
@@ -241,7 +241,7 @@ namespace Chess
             controller.UpdateMovesOnBoard();
             controller.GenerateLegalMoves();
             viewmodel.RunEventHandler = true;
-            MyPopup.IsOpen = false;
+            PromotionPopup.IsOpen = false;
         }
 
         //document

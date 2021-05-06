@@ -66,14 +66,6 @@ namespace Chess
             set { board = value; }
         }
 
-        private Grid extBoard;
-
-        public Grid ExternalBoard
-        {
-            get { return extBoard; }
-            set { extBoard = value; }
-        }
-
         private bool pieceSelected;
 
         public bool IsPieceSelected

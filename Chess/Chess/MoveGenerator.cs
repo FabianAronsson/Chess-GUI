@@ -536,9 +536,10 @@ namespace Chess
                     {
                         if (!(board[i, j] is EmptySquare))
                         {
-                            var selectedPiece = board[i, j];
+                            var selectedPiece = board[i, j]; 
                             if (currentPiece.isBlack != board[i, j].isBlack)
                             {
+                                //CHECK FOR CASTLING COORDINATES BUG BUG BUG
                                 kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);
                                 
                             }

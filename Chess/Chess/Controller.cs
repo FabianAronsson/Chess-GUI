@@ -12,30 +12,31 @@ namespace Chess
 {
     public class Controller
     {
-        private Model model; 
+        private Model model;
 
         private Controller()
         {
             model = new Model();
         }
-       
+
         public static Controller InitMainController()
         {
             return new Controller();
         }
-        
+
         //todo document method
-        public Piece [,] CreatePieces()
+        public Piece[,] CreatePieces()
         {
             PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
-            Piece[,] pieces = new Piece[8,8];
+            Piece[,] pieces = new Piece[8, 8];
             char[] FENotation = ConvertStringToCharArray(model.FENotation);
             int xIndex = 0;
             int yIndex = 0;
             int index = 0;
-            while (true) 
-            { 
-                if (char.IsDigit(FENotation[index])){
+            while (true)
+            {
+                if (char.IsDigit(FENotation[index]))
+                {
                     if (int.Parse(FENotation[index].ToString()) == 8)
                     {
                         for (int i = 0; i < 8; i++)
@@ -53,7 +54,7 @@ namespace Chess
                             pieces[yIndex, tempIndex] = factory.CreatePiece('S', true);
                             tempIndex++;
                         }
-                        
+
                         xIndex += Convert.ToInt32(FENotation[index].ToString());
                     }
                 }
@@ -62,14 +63,14 @@ namespace Chess
                     yIndex++;
                     xIndex = 0;
                 }
-                else if(FENotation[index].Equals(' '))
+                else if (FENotation[index].Equals(' '))
                 {
                     break;
                 }
                 else
                 {
                     pieces[yIndex, xIndex] = factory.CreatePiece(FENotation[index], IsFENPieceBlack(FENotation, index));
-                    if(xIndex == 7)
+                    if (xIndex == 7)
                     {
                         xIndex = 0;
                     }
@@ -77,17 +78,17 @@ namespace Chess
                     {
                         xIndex++;
                     }
-                    
+
                 }
-                index++; 
+                index++;
             }
             model.InternalBoard = pieces;
             return pieces;
         }
 
-        
 
-        public bool IsFENPieceBlack (char [] FENChar, int index)
+
+        public bool IsFENPieceBlack(char[] FENChar, int index)
         {
             if (char.IsLower(FENChar[index]))
             {
@@ -106,20 +107,20 @@ namespace Chess
 
         public void SaveCoordinates(int y, int x)
         {
-            
-                if (!model.IsPieceSelected)
-                {
-                    model.YSourceCoordinate = y;
-                    model.XSourceCoordinate = x;
-                    model.IsPieceSelected = true;
-                }
-                else
-                {
-                    model.DestinationY = y;
-                    model.DestinationX = x;
-                    model.IsDestinationPieceSelected = true;
-                }
-            
+
+            if (!model.IsPieceSelected)
+            {
+                model.YSourceCoordinate = y;
+                model.XSourceCoordinate = x;
+                model.IsPieceSelected = true;
+            }
+            else
+            {
+                model.DestinationY = y;
+                model.DestinationX = x;
+                model.IsDestinationPieceSelected = true;
+            }
+
         }
 
         public bool IsDestinationPieceSelected()
@@ -146,7 +147,7 @@ namespace Chess
             for (int i = 0; i < piece.legalMoves.Count; i++)
             { //Needs more validation
 
-                
+
                 if (piece.legalMoves[i] == destinationCoords)
                 {
                     //Special cases for pawns
@@ -158,24 +159,58 @@ namespace Chess
                     //Special cases for kings
                     else if (piece is King king)
                     {
-                        
-                        SetSpecialKingProperties(king, king.legalMoves[i], destinationCoords);
+                        SetSpecialKingProperties(king, king.legalMoves[i]);
                         king.canCastleK = false;
                         king.canCastleQ = false;
                     }
+                    else if (piece is Rook rook)
+                    {
+                        if (model.YSourceCoordinate == (0) && model.XSourceCoordinate == (7))
+                        {
+                            if (GetSpecificPiece(0, 4) is King kingPiece)
+                            {
+                                kingPiece.canCastleK = false;
+                                model.InternalBoard[0, 4] = kingPiece;
+                            }
+                        }
+                        else if (model.YSourceCoordinate == (7) && model.XSourceCoordinate == (7)){
+                            if (GetSpecificPiece(7, 4) is King kingPiece)
+                            {
+                                kingPiece.canCastleK = false;
+                                model.InternalBoard[7, 4] = kingPiece;
+                            }
+                        }
 
-                    
+                        if (model.YSourceCoordinate == (0) && model.XSourceCoordinate == (0))
+                        {
+                            if (GetSpecificPiece(0, 4) is King kingPiece)
+                            {
+                                kingPiece.canCastleQ = false;
+                                model.InternalBoard[0, 4] = kingPiece;
+                            }
+                        }
+                        else if (model.YSourceCoordinate == (7) && model.XSourceCoordinate == (0))
+                        {
+                            if (GetSpecificPiece(7, 4) is King kingPiece)
+                            {
+                                kingPiece.canCastleQ = false;
+                                model.InternalBoard[7, 4] = kingPiece;
+                            }
+                        }
+                    }
 
-                    
+
+
+
                     return true;
 
-                    
+
                 }
             }
             return false;
         }
 
-        private void SetSpecialKingProperties(King king, string currentLegalMove, string destinationCoordinates)
+        private void SetSpecialKingProperties(King king, string currentLegalMove)
         {
             if (king.isBlack)
             {
@@ -186,35 +221,74 @@ namespace Chess
                         model.SpecialCaseCoordinates[0] = 0;
                         model.SpecialCaseCoordinates[1] = 7;
 
-                        model.InternalBoard[0, 7] = CreatePiece('S', true);
+                        var tempPiece = model.InternalBoard[0, 5];
+                        model.InternalBoard[0, 5] = model.InternalBoard[0, 7];
+                        model.InternalBoard[0, 7] = tempPiece;
 
                         model.SpecialCaseCoordinates.Add(0);
                         model.SpecialCaseCoordinates.Add(5);
 
-                        model.InternalBoard[0, 5] = CreatePiece('r', true);
                     }
-                    
+
                 }
-                
-                if(king.canCastleQ)
+
+                if (king.canCastleQ)
                 {
                     if (currentLegalMove.Equals(0 + " " + 2))
                     {
                         model.SpecialCaseCoordinates[0] = 0;
                         model.SpecialCaseCoordinates[1] = 0;
 
-                        model.InternalBoard[0, 0] = CreatePiece('S', true);
+
+                        var tempPiece = model.InternalBoard[0, 3];
+                        model.InternalBoard[0, 3] = model.InternalBoard[0, 0];
+                        model.InternalBoard[0, 0] = tempPiece;
+
 
                         model.SpecialCaseCoordinates.Add(0);
                         model.SpecialCaseCoordinates.Add(3);
 
-                        model.InternalBoard[0, 3] = CreatePiece('r', true);
                     }
                 }
             }
             else
             {
+                if (king.canCastleK)
+                {
+                    if (currentLegalMove.Equals(7 + " " + 6))
+                    {
+                        model.SpecialCaseCoordinates[0] = 7;
+                        model.SpecialCaseCoordinates[1] = 7;
 
+                        var tempPiece = model.InternalBoard[7, 5];
+                        model.InternalBoard[7, 5] = model.InternalBoard[7, 7];
+                        model.InternalBoard[7, 7] = tempPiece;
+
+                        model.SpecialCaseCoordinates.Add(7);
+                        model.SpecialCaseCoordinates.Add(5);
+
+                    }
+
+                }
+
+                if (king.canCastleQ)
+                {
+                    if (currentLegalMove.Equals(7 + " " + 2))
+                    {
+                        model.SpecialCaseCoordinates[0] = 7;
+                        model.SpecialCaseCoordinates[1] = 0;
+
+
+                        var tempPiece = model.InternalBoard[7, 3];
+                        model.InternalBoard[7, 3] = model.InternalBoard[7, 0];
+                        model.InternalBoard[7, 0] = tempPiece;
+
+
+                        model.SpecialCaseCoordinates.Add(7);
+                        model.SpecialCaseCoordinates.Add(3);
+
+                    }
+                }
             }
         }
 
@@ -285,7 +359,7 @@ namespace Chess
             }
         }
 
-        
+
 
         public Piece CreatePiece(char typeOfPiece, bool isBlack)
         {
@@ -296,7 +370,7 @@ namespace Chess
         public Piece GetSourcePiece()
         {
             return model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
-            
+
         }
 
         public List<int> GetDestinationCoordinates()
@@ -308,7 +382,7 @@ namespace Chess
         {
             return new List<int> { model.YSourceCoordinate, model.XSourceCoordinate };
         }
-        
+
         public void GenerateLegalMoves()
         {
             MoveGenerator generate = new MoveGenerator();
@@ -318,10 +392,14 @@ namespace Chess
         public List<int> GetSpecialCaseCoordinates()
         {
             return model.SpecialCaseCoordinates;
-            
         }
 
-        
+        public Piece GetSpecificPiece(int y, int x)
+        {
+            return model.InternalBoard[y, x];
+        }
+
+
         /*public Grid CreateGrid() // encapsulate code?
         {
             Grid board = new Grid

@@ -113,43 +113,8 @@ namespace Chess
             List<int> destinationCoordinates = controller.GetDestinationCoordinates();
             if (sourceCoordinates != destinationCoordinates)
             {
+                SetSpecialCaseVisuals();
 
-                //REFACTOR INTO OWN METHOD
-                List<int> specialCaseCoordinates = controller.GetSpecialCaseCoordinates();
-                if (specialCaseCoordinates[0] != 9) //ARBITRARY NUMBER, does not matter what number it is, as long as it is not a number used by the board.
-                {
-                    if (specialCaseCoordinates.Count == 2)
-                    {
-                        RemovePiece(specialCaseCoordinates);
-                        SetPieceToBoard(specialCaseCoordinates, controller.CreatePiece('S', true));
-                    }
-                    else if(specialCaseCoordinates.Count == 4)
-                    {
-                        List<int> sourcePieceCoordinates = new List<int> { specialCaseCoordinates[0], specialCaseCoordinates[1] };
-                        List<int> destinationPieceCoordinates = new List<int> { specialCaseCoordinates[2], specialCaseCoordinates[3] };
-                        RemovePiece(sourcePieceCoordinates);
-                        RemovePiece(destinationPieceCoordinates);
-
-                        var square = controller.CreatePiece('S', true);
-                        square.Click += new RoutedEventHandler(GetPositionOfSquare);
-                        SetPieceToBoard(sourcePieceCoordinates, square);
-                        char type = ' ';
-                        bool isBlack = true;
-                        if (controller.IsPieceBlack(destinationPieceCoordinates)) //GET SPECIFIC PIECE, DO NOT CREATE A NEW ONE, THIS IS TO GET ALL LEGAL MOVES
-                        {
-                            type = 'r';
-                        }
-                        else
-                        {
-                            type = 'R';
-                            isBlack = true;
-                        }
-                        var newPiece = controller.CreatePiece(type, isBlack);
-                        newPiece.Click += new RoutedEventHandler(MovePiece);
-                        SetPieceToBoard(destinationPieceCoordinates, newPiece);
-                    }
-                }
-                
                 RemovePiece(sourceCoordinates); //remove source piece
                 RemovePiece(destinationCoordinates); //remove destination piece
 
@@ -162,6 +127,33 @@ namespace Chess
 
                 //reflect the visual change to the internal board
                 controller.UpdateMovesOnBoard();
+            }
+        }
+
+        //todo, document method
+        private void SetSpecialCaseVisuals()
+        {
+            List<int> specialCaseCoordinates = controller.GetSpecialCaseCoordinates();
+            if (specialCaseCoordinates[0] != 9) //ARBITRARY NUMBER, does not matter what number it is, as long as it is not a number used by the board.
+            {
+                if (specialCaseCoordinates.Count == 2)
+                {
+                    RemovePiece(specialCaseCoordinates);
+                    SetPieceToBoard(specialCaseCoordinates, controller.CreatePiece('S', true));
+                }
+                else if (specialCaseCoordinates.Count == 4)
+                {
+                    List<int> sourcePieceCoordinates = new List<int> { specialCaseCoordinates[0], specialCaseCoordinates[1] };
+                    List<int> destinationPieceCoordinates = new List<int> { specialCaseCoordinates[2], specialCaseCoordinates[3] };
+                    RemovePiece(sourcePieceCoordinates);
+                    RemovePiece(destinationPieceCoordinates);
+
+                    var square = controller.CreatePiece('S', true);
+                    square.Click += new RoutedEventHandler(GetPositionOfSquare);
+                    SetPieceToBoard(sourcePieceCoordinates, square);
+                   
+                    SetPieceToBoard(destinationPieceCoordinates, controller.GetSpecificPiece(destinationPieceCoordinates[0], destinationPieceCoordinates[1]));
+                }
             }
         }
 

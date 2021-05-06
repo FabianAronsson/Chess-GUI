@@ -163,40 +163,9 @@ namespace Chess
                         king.canCastleK = false;
                         king.canCastleQ = false;
                     }
-                    else if (piece is Rook rook)
+                    else if (piece is Rook)
                     {
-                        if (model.YSourceCoordinate == (0) && model.XSourceCoordinate == (7))
-                        {
-                            if (GetSpecificPiece(0, 4) is King kingPiece)
-                            {
-                                kingPiece.canCastleK = false;
-                                model.InternalBoard[0, 4] = kingPiece;
-                            }
-                        }
-                        else if (model.YSourceCoordinate == (7) && model.XSourceCoordinate == (7)){
-                            if (GetSpecificPiece(7, 4) is King kingPiece)
-                            {
-                                kingPiece.canCastleK = false;
-                                model.InternalBoard[7, 4] = kingPiece;
-                            }
-                        }
-
-                        if (model.YSourceCoordinate == (0) && model.XSourceCoordinate == (0))
-                        {
-                            if (GetSpecificPiece(0, 4) is King kingPiece)
-                            {
-                                kingPiece.canCastleQ = false;
-                                model.InternalBoard[0, 4] = kingPiece;
-                            }
-                        }
-                        else if (model.YSourceCoordinate == (7) && model.XSourceCoordinate == (0))
-                        {
-                            if (GetSpecificPiece(7, 4) is King kingPiece)
-                            {
-                                kingPiece.canCastleQ = false;
-                                model.InternalBoard[7, 4] = kingPiece;
-                            }
-                        }
+                        SetSpecialRookProperties();
                     }
 
 
@@ -208,6 +177,43 @@ namespace Chess
                 }
             }
             return false;
+        }
+
+        private void SetSpecialRookProperties()
+        {
+            if (model.YSourceCoordinate == (0) && model.XSourceCoordinate == (7))
+            {
+                if (GetSpecificPiece(0, 4) is King kingPiece)
+                {
+                    kingPiece.canCastleK = false;
+                    model.InternalBoard[0, 4] = kingPiece;
+                }
+            }
+            else if (model.YSourceCoordinate == (7) && model.XSourceCoordinate == (7))
+            {
+                if (GetSpecificPiece(7, 4) is King kingPiece)
+                {
+                    kingPiece.canCastleK = false;
+                    model.InternalBoard[7, 4] = kingPiece;
+                }
+            }
+
+            if (model.YSourceCoordinate == (0) && model.XSourceCoordinate == (0))
+            {
+                if (GetSpecificPiece(0, 4) is King kingPiece)
+                {
+                    kingPiece.canCastleQ = false;
+                    model.InternalBoard[0, 4] = kingPiece;
+                }
+            }
+            else if (model.YSourceCoordinate == (7) && model.XSourceCoordinate == (0))
+            {
+                if (GetSpecificPiece(7, 4) is King kingPiece)
+                {
+                    kingPiece.canCastleQ = false;
+                    model.InternalBoard[7, 4] = kingPiece;
+                }
+            }
         }
 
         private void SetSpecialKingProperties(King king, string currentLegalMove)
@@ -294,7 +300,8 @@ namespace Chess
 
         private void SetSpecialPawnProperties(Pawn pawn, string currentLegalMove)
         {
-            //if the delta of destination coordinate and source coordinate equals 2, then the move made was a double move. The coordinate behind the pawn is then saved as an eligible en passant square
+            //if the delta of destination coordinate and source coordinate equals 2, then the move made was a double move. 
+            //The coordinate behind the pawn is then saved as an eligible en passant square.
             if (model.DestinationY - model.YSourceCoordinate == 2)
             {
                 model.EnPassantCoordinate[0] = model.YSourceCoordinate + 1;
@@ -306,6 +313,7 @@ namespace Chess
                 model.EnPassantCoordinate[0] = model.YSourceCoordinate - 1;
                 model.EnPassantCoordinate[1] = model.XSourceCoordinate;
             }
+
             if (currentLegalMove.Equals(model.EnPassantCoordinate[0] + " " + model.EnPassantCoordinate[1]))
             {
                 if (pawn.isBlack)
@@ -318,6 +326,12 @@ namespace Chess
                     model.SpecialCaseCoordinates[0] = model.EnPassantCoordinate[0] + 1;
                     model.SpecialCaseCoordinates[1] = model.EnPassantCoordinate[1];
                 }
+            }
+
+            //If any pawn move is on the 0th or 7th rank then that means that the pawn is on the final file, which also means it should promote.
+            if (model.DestinationY == 0 || model.DestinationY == 7)
+            {
+                model.IsPromotion = true;
             }
         }
 
@@ -339,7 +353,18 @@ namespace Chess
             Piece sourcePiece = model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
 
             pieces[model.YSourceCoordinate, model.XSourceCoordinate] = factory.CreatePiece('S', true);
-            pieces[model.DestinationY, model.DestinationX] = sourcePiece;
+
+            if (model.PromotionPiece != null)
+            {
+                pieces[model.DestinationY, model.DestinationX] = model.PromotionPiece;
+                model.IsPromotion = false;
+                model.PromotionPiece = null;
+
+            }
+            else
+            {
+                pieces[model.DestinationY, model.DestinationX] = sourcePiece;
+            }
             model.InternalBoard = pieces;
 
         }
@@ -349,7 +374,6 @@ namespace Chess
             model.IsPieceSelected = false;
             model.IsDestinationPieceSelected = false;
             model.SpecialCaseCoordinates = new List<int> { 9, 9 };
-
         }
 
         public bool IsPieceBlack(List<int> coordinates)
@@ -404,6 +428,20 @@ namespace Chess
             return model.InternalBoard[y, x];
         }
 
+        public bool GetIsPromotion()
+        {
+            return model.IsPromotion;
+        }
+
+        public Piece GetPromotionPiece()
+        {
+            return model.PromotionPiece;
+        }
+
+        public void SetPromotionPiece(Piece promotionPiece)
+        {
+            model.PromotionPiece = promotionPiece;
+        }
 
         /*public Grid CreateGrid() // encapsulate code?
         {

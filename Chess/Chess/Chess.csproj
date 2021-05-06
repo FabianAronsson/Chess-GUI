@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Viewmodel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -128,6 +129,14 @@
   <ItemGroup>
     <None Include="Sound\Capture.wav" />
     <None Include="Sound\Move.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\DualTypeImages\DualBishop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\DualTypeImages\DualKnight.png" />
+    <Resource Include="Images\DualTypeImages\DualQueen.png" />
+    <Resource Include="Images\DualTypeImages\DualRook.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

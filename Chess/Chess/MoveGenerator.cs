@@ -520,6 +520,7 @@ namespace Chess
             return currentPiece; // check so it is working, was "pawn" before.
         }
 
+        //document
         private Piece GenerateKingMoves(Piece currentPiece, int y, int x)
         {
             List<string> kingMoves = GenerateLateralKingMoves(currentPiece, y, x);
@@ -547,16 +548,13 @@ namespace Chess
                     }
                 }
             }
-
-
-
             currentPiece.legalMoves = kingMoves;
-
-
-
             return currentPiece;
         }
 
+        //document, takes advantage of the fact that kings can ONLY castle in a set position in normal chess
+        //for other gamemodes such as Chess960, other more elaborate methods need to be applied due to the 
+        //bizarre situations that can occur
         private List<string> GetKingCastleCoordinates(Piece currentPiece, int y, int x)
         {
             King king = currentPiece as King;
@@ -608,6 +606,7 @@ namespace Chess
             return castleCoordinates;
         }
 
+        //document
         private List<string> RemoveIllegalSquaresForKing(List<string> kingMoves, Piece selectedPiece)
         {
             List<string> coordinatesToBeDeleted = new List<string>(kingMoves.Count);
@@ -616,10 +615,15 @@ namespace Chess
                 string kingmove = kingMoves[i];
                 for (int j = 0; j < selectedPiece.legalMoves.Count; j++)
                 {
+                    //if any of the kings pseudo-legal squares is equal to ANY of the selectedpiece's 
+                    //legal squares, then that means the pseudo-legal move is illegal.
                     if (kingmove.Equals(selectedPiece.legalMoves[j]))
                     {
                         coordinatesToBeDeleted.Add(kingmove);
 
+                        //If any of the kings first x-axis moves comes through in the previous 
+                        //if statement then it must mean that the next move also is an illegal 
+                        //square since a king cannot castle through a check.
                         if (kingmove.Equals(0 + " " + 5) || kingmove.Equals(0 + " " + 3) || kingmove.Equals(7 + " " + 5) || kingmove.Equals(7 + " " + 3))
                         {
                             coordinatesToBeDeleted.Add(CheckCastlingSquares(kingmove));
@@ -629,7 +633,8 @@ namespace Chess
                     }
                 }
             }
-
+            
+            //delete previous pseudo-legal moves for the current king
             for (int i = 0; i < coordinatesToBeDeleted.Count; i++)
             {
                 kingMoves.Remove(coordinatesToBeDeleted[i]);
@@ -640,18 +645,23 @@ namespace Chess
 
         public string CheckCastlingSquares(string castlingSquare)
         {
+            //positive x-axis for black king
             if (castlingSquare.Equals(0 + " " + 5))
             {
                 return 0 + " " + 6;
             }
+            //negative x-axis for black king
             else if(castlingSquare.Equals(0 + " " + 3))
             {
                 return 0 + " " + 2;
             }
+            //positive x-axis for white king
             else if (castlingSquare.Equals(7 + " " + 5))
             {
                 return 7 + " " + 6;
             }
+            //no other move but the white kings final castle move 
+            //can be the last one, which means the negative x-axis for the white king
             else
             {
                 return 7 + " " + 2;

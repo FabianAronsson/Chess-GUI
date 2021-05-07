@@ -42,7 +42,7 @@ namespace Chess
         }
         
         //standard setup for chess, can be substituted for any position
-        private string FEN = "8/3P4/8/8/8/8/4p3/8 w - - 0 1";
+        private string FEN = "8/8/8/8/3K4/4rr2/8/8 w - - 0 1";
 
         public string FENotation
         {
@@ -50,7 +50,7 @@ namespace Chess
             set { FEN = value; }
         }
 
-        private bool isBlackToMove;
+        private bool isBlackToMove = false;
 
         public bool IsItBlackToMove
         {

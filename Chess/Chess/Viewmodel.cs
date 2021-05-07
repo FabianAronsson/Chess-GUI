@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chess
 {
-    public class Viewmodel
+    public class ViewModel
     {
         private bool runEventHandler = true;
 

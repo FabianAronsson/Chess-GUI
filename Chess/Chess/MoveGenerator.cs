@@ -10,12 +10,11 @@ namespace Chess
     public class MoveGenerator
     {
         private Piece[,] board;
-        private bool isBlackToMove;
+        private bool validateKingMoves = false;
 
-        public Piece[,] GeneratePseudoLegalMoves(Piece[,] board, bool isBlackToMove, List<int> enPassantSquare) //board is binded to Internalboard.
+        public Piece[,] GeneratePseudoLegalMoves(Piece[,] board, List<int> enPassantSquare) //board is binded to Internalboard.
         {
-            this.board = board;
-            this.isBlackToMove = isBlackToMove;
+            this.board = (Piece[,])board.Clone();
             ResetPreviousLegalMoves(board);
 
             for (int i = 0; i < 8; i++)
@@ -49,18 +48,20 @@ namespace Chess
 
             this.board = board;
 
-
-            for (int i = 0; i < 8; i++)
+            if (!validateKingMoves)
             {
-                for (int j = 0; j < 8; j++)
+                for (int i = 0; i < 8; i++)
                 {
-                    var currentPiece = board[i, j];
-                    if(board[i, j].typeOfPiece.Equals("King")){
-                        board[i, j] = GenerateKingMoves(currentPiece, i, j);
-                    }     
+                    for (int j = 0; j < 8; j++)
+                    {
+                        var currentPiece = board[i, j];
+                        if (board[i, j].typeOfPiece.Equals("King"))
+                        {
+                            board[i, j] = GenerateKingMoves(currentPiece, i, j);
+                        }
+                    }
                 }
             }
-
             return board; //not actually neccessary
         }
 
@@ -436,7 +437,7 @@ namespace Chess
                                     }
 
                                 }
-                                
+
                                 //If the pawn cannot do a double move then that means the pawn cannot move any further. If j == 1 then that
                                 //means the pawn is on its last possible move, if no double move is possible, then no more legal moves forward are possible.
                                 else if (j == 1)
@@ -528,7 +529,7 @@ namespace Chess
             kingMoves.AddRange(GetKingCastleCoordinates(currentPiece, y, x));
 
             //due to a "bug" with "AddRange", duplicate values were assigned, creating a need for distinct values
-            kingMoves = kingMoves.Distinct().ToList(); 
+            kingMoves = kingMoves.Distinct().ToList();
 
 
             for (int i = 0; i < 8; i++)
@@ -539,21 +540,88 @@ namespace Chess
                     {
                         if (!(board[i, j] is EmptySquare))
                         {
-                            var selectedPiece = board[i, j]; 
+                            var selectedPiece = board[i, j];
                             if (currentPiece.isBlack != board[i, j].isBlack)
                             {
-                                kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);   
+                                kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);
                             }
                         }
                     }
                 }
             }
-            currentPiece.legalMoves = kingMoves;
+            currentPiece.legalMoves = RemoveIllegalKingCaptureSquares(kingMoves, currentPiece);
             return currentPiece;
         }
 
-        //document, takes advantage of the fact that kings can ONLY castle in a set position in normal chess
-        //for other gamemodes such as Chess960, other more elaborate methods need to be applied due to the 
+
+        //removes capture squares that is protected by another square, document more
+        private List<string> RemoveIllegalKingCaptureSquares(List<string> kingMoves, Piece king)
+        {
+            string[] stringKingMoves = new string[2];
+            var tempBoard = (Piece[,])board.Clone();
+            int kingY;
+            int kingX;
+            List<string> illegalCoordinates = new List<string>();
+            PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
+
+            for (int i = 0; i < kingMoves.Count; i++)
+            {
+                stringKingMoves = kingMoves[i].Split();
+                kingY = int.Parse(stringKingMoves[0]);
+                kingX = int.Parse(stringKingMoves[1]);
+
+                if (!(board[kingY, kingX] is EmptySquare))
+                {
+                    if (king.isBlack != tempBoard[kingY, kingX].isBlack)
+                    {
+                        validateKingMoves = true;
+                        var tempPiece = tempBoard[kingY, kingX];
+                        tempBoard[kingY, kingX] = factory.CreatePiece('S', true) ;
+                        var newBoard = GeneratePseudoLegalMoves(tempBoard, new List<int> { 9, 9 });
+                        validateKingMoves = false;
+                        if (IsCaptureSquareProtected(newBoard, kingMoves[i]))
+                        {
+                            illegalCoordinates.Add(kingMoves[i]);
+                            
+                        }
+                        tempBoard[kingY, kingX] = tempPiece;
+                    }
+                }
+
+            }
+            for (int i = 0; i < illegalCoordinates.Count; i++)
+            {
+                kingMoves.Remove(illegalCoordinates[i]);
+            }
+
+            validateKingMoves = false;
+
+            return kingMoves;
+        }
+
+        //Checks if a square the king is attacking is protected or not.
+        private bool IsCaptureSquareProtected(Piece[,] board, string currentMove)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (!(board[i, j] is EmptySquare))
+                    {
+                        if (board[i, j].legalMoves.Contains(currentMove))
+                        {
+                            return true;
+                        }
+                    }
+                    
+                }
+            }
+            return false;
+        }
+
+
+        //document, takes advantage of the fact that kings can ONLY castle in a set position in normal chess,
+        //for variants such as Chess960, other more elaborate methods need to be applied due to the 
         //bizarre situations that can occur
         private List<string> GetKingCastleCoordinates(Piece currentPiece, int y, int x)
         {
@@ -563,41 +631,52 @@ namespace Chess
             {
                 if (y == 0 && x == 4)
                 {
-                    if (board[0, x + 1] is EmptySquare && board[0, x + 2] is EmptySquare)
+                    if (board[0, 7] is Rook && board[0, 7].isBlack)
                     {
-                        if (king.canCastleK)
+                        if (board[0, x + 1] is EmptySquare && board[0, x + 2] is EmptySquare)
                         {
-                            castleCoordinates.Add("0 6");
+                            if (king.canCastleK)
+                            {
+                                castleCoordinates.Add("0 6");
+                            }
                         }
                     }
 
-                    if (board[0, x - 1] is EmptySquare && board[0, x - 2] is EmptySquare)
+                    if (board[0, 0] is Rook && board[0, 0].isBlack)
                     {
-                        if (king.canCastleQ)
+                        if (board[0, x - 1] is EmptySquare && board[0, x - 2] is EmptySquare)
                         {
-                            castleCoordinates.Add("0 2");
+                            if (king.canCastleQ)
+                            {
+                                castleCoordinates.Add("0 2");
+                            }
                         }
                     }
-                    
                 }
             }
             else
             {
                 if (y == 7 && x == 4)
                 {
-                    if (board[7, x + 1] is EmptySquare && board[7, x + 2] is EmptySquare)
+                    if (board[7, 7] is Rook && !board[7, 7].isBlack)
                     {
-                        if (king.canCastleK)
+                        if (board[7, x + 1] is EmptySquare && board[7, x + 2] is EmptySquare)
                         {
-                            castleCoordinates.Add("7 6");
+                            if (king.canCastleK)
+                            {
+                                castleCoordinates.Add("7 6");
+                            }
                         }
-                    }
 
-                    if (board[7, x - 1] is EmptySquare && board[7, x + 2] is EmptySquare)
-                    {
-                        if (king.canCastleQ)
+                        if (board[7, 0] is Rook && !board[7, 0].isBlack)
                         {
-                            castleCoordinates.Add("7 2");
+                            if (board[7, x - 1] is EmptySquare && board[7, x + 2] is EmptySquare)
+                            {
+                                if (king.canCastleQ)
+                                {
+                                    castleCoordinates.Add("7 2");
+                                }
+                            }
                         }
                     }
                 }
@@ -615,7 +694,7 @@ namespace Chess
                 string kingmove = kingMoves[i];
                 for (int j = 0; j < selectedPiece.legalMoves.Count; j++)
                 {
-                    //if any of the kings pseudo-legal squares is equal to ANY of the selectedpiece's 
+                    //if any of the kings pseudo-legal squares is equal to ANY of the selectedPiece's 
                     //legal squares, then that means the pseudo-legal move is illegal.
                     if (kingmove.Equals(selectedPiece.legalMoves[j]))
                     {
@@ -628,18 +707,18 @@ namespace Chess
                         {
                             coordinatesToBeDeleted.Add(CheckCastlingSquares(kingmove));
                         }
-                        
+
                         break;
                     }
                 }
             }
-            
+
             //delete previous pseudo-legal moves for the current king
             for (int i = 0; i < coordinatesToBeDeleted.Count; i++)
             {
                 kingMoves.Remove(coordinatesToBeDeleted[i]);
             }
-            
+
             return kingMoves;
         }
 
@@ -651,7 +730,7 @@ namespace Chess
                 return 0 + " " + 6;
             }
             //negative x-axis for black king
-            else if(castlingSquare.Equals(0 + " " + 3))
+            else if (castlingSquare.Equals(0 + " " + 3))
             {
                 return 0 + " " + 2;
             }

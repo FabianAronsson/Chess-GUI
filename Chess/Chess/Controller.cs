@@ -147,32 +147,40 @@ namespace Chess
             for (int i = 0; i < piece.legalMoves.Count; i++)
             { //Needs more validation
 
-
-                if (piece.legalMoves[i] == destinationCoords)
+                if (piece.isBlack == model.IsItBlackToMove)
                 {
-                    //Special cases for pawns
-                    if (piece is Pawn pawn)
+                    if (piece.legalMoves[i] == destinationCoords)
                     {
-                        pawn.canDoubleMove = false;
-                        SetSpecialPawnProperties(pawn, pawn.legalMoves[i]);
+
+                        //Special cases for pawns
+                        if (piece is Pawn pawn)
+                        {
+                            pawn.canDoubleMove = false;
+                            SetSpecialPawnProperties(pawn, pawn.legalMoves[i]);
+                        }
+                        //Special cases for kings
+                        else if (piece is King king)
+                        {
+                            SetSpecialKingProperties(king, king.legalMoves[i]);
+                            king.canCastleK = false;
+                            king.canCastleQ = false;
+                        }
+                        else if (piece is Rook)
+                        {
+                            SetSpecialRookProperties();
+                        }
+
+                        if (piece.isBlack)
+                        {
+                            model.IsItBlackToMove = false;
+                        }
+                        else
+                        {
+                            model.IsItBlackToMove = true;
+                        }
+
+                        return true;
                     }
-                    //Special cases for kings
-                    else if (piece is King king)
-                    {
-                        SetSpecialKingProperties(king, king.legalMoves[i]);
-                        king.canCastleK = false;
-                        king.canCastleQ = false;
-                    }
-                    else if (piece is Rook)
-                    {
-                        SetSpecialRookProperties();
-                    }
-
-
-
-
-                    return true;
-
 
                 }
             }
@@ -306,7 +314,7 @@ namespace Chess
             {
                 model.EnPassantCoordinate[0] = model.YSourceCoordinate + 1;
                 model.EnPassantCoordinate[1] = model.XSourceCoordinate;
-                
+
             }
             else if (model.YSourceCoordinate - model.DestinationY == 2)
             {
@@ -341,7 +349,7 @@ namespace Chess
             model.EnPassantCoordinate[1] = 9;
         }
 
-        public string ConvertIntToString(int y, int x)
+        private string ConvertIntToString(int y, int x)
         {
             return y + " " + x;
         }
@@ -376,20 +384,6 @@ namespace Chess
             model.SpecialCaseCoordinates = new List<int> { 9, 9 };
         }
 
-        public bool IsPieceBlack(List<int> coordinates)
-        {
-            if (model.InternalBoard[coordinates[0], coordinates[1]].isBlack)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-
-
         public Piece CreatePiece(char typeOfPiece, bool isBlack)
         {
             PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
@@ -415,7 +409,7 @@ namespace Chess
         public void GenerateLegalMoves()
         {
             MoveGenerator generate = new MoveGenerator();
-            generate.GeneratePseudoLegalMoves(model.InternalBoard, model.IsItBlackToMove, model.EnPassantCoordinate);
+            generate.GeneratePseudoLegalMoves(model.InternalBoard, model.EnPassantCoordinate);
         }
 
         public List<int> GetSpecialCaseCoordinates()
@@ -443,25 +437,9 @@ namespace Chess
             model.PromotionPiece = promotionPiece;
         }
 
-        /*public Grid CreateGrid() // encapsulate code?
+        public bool GetTurnOrder()
         {
-            Grid board = new Grid
-            {
-                Name = "Board",
-                ShowGridLines = true //for debugging purposes
-            };
-            for (int i = 0; i < 8; i++)
-            {
-                board.RowDefinitions.Add(new RowDefinition());
-                board.ColumnDefinitions.Add(new ColumnDefinition());
-            }
-            ImageBrush background = new ImageBrush();
-            background.ImageSource = new BitmapImage(new Uri("./../../Images/Board.png", UriKind.Relative));
-            board.Background = background;
-            model.ExternalBoard = board;
-            return board;
-        }*/
-
-
+            return model.IsItBlackToMove;
+        }
     }
 }

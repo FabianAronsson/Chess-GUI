@@ -22,12 +22,12 @@ namespace Chess
     public partial class MainWindow : Window
     {
         private Controller controller;
-        private Viewmodel viewmodel;
+        private ViewModel viewModel;
         public MainWindow()
         {
             InitializeComponent();
             controller = Controller.InitMainController();
-            viewmodel = new Viewmodel();
+            viewModel = new ViewModel();
             //CreateBoard();
 
         }
@@ -42,18 +42,24 @@ namespace Chess
 
         private void MovePiece(object sender, RoutedEventArgs e)
         {
-            if (viewmodel.RunEventHandler)
+            if (viewModel.RunEventHandler)
             {
                 if (e.Source is Piece piece)
                 {
+
                     controller.SaveCoordinates(Grid.GetRow(piece), Grid.GetColumn(piece));
                     //display legal moves
                     if (!controller.IsDestinationPieceSelected())
                     {
-                        DisplayLegalMoves(piece);
+                        if (piece.isBlack == controller.GetTurnOrder())
+                        {
+                            DisplayLegalMoves(piece);
+
+                        }
                     }
 
                     CanPlayerMakeMove();
+
                 }
             }
 
@@ -171,7 +177,7 @@ namespace Chess
         private void ShowPopup()
         {
             PromotionPopup.IsOpen = true;
-            viewmodel.RunEventHandler = false;
+            viewModel.RunEventHandler = false;
         }
 
         //document
@@ -240,7 +246,7 @@ namespace Chess
             UpdateDestinationPromotionPiece();
             controller.UpdateMovesOnBoard();
             controller.GenerateLegalMoves();
-            viewmodel.RunEventHandler = true;
+            viewModel.RunEventHandler = true;
             PromotionPopup.IsOpen = false;
         }
 
@@ -312,7 +318,7 @@ namespace Chess
 
         private void GetPositionOfSquare(object sender, RoutedEventArgs e)
         {
-            if (viewmodel.RunEventHandler)
+            if (viewModel.RunEventHandler)
             {
                 if (e.Source is EmptySquare square)
                 {

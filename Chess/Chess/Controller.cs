@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -169,7 +170,8 @@ namespace Chess
                         {
                             SetSpecialRookProperties();
                         }
-
+                        
+                        //Change turn order
                         if (piece.isBlack)
                         {
                             model.IsItBlackToMove = false;
@@ -179,12 +181,40 @@ namespace Chess
                             model.IsItBlackToMove = true;
                         }
 
+                        PlaySound(piece.isBlack, destinationCoords);
+
                         return true;
                     }
-
                 }
             }
             return false;
+        }
+
+        private bool DetermineTypeOfMove(bool isBlack, string destinationCoords)
+        {
+            if (isBlack != model.InternalBoard[model.DestinationY, model.DestinationX].isBlack && !(model.InternalBoard[model.DestinationY, model.DestinationX] is EmptySquare))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void PlaySound(bool isBlack, string destinationCoords)
+        {
+
+            if (DetermineTypeOfMove(isBlack, destinationCoords))
+            {
+                SoundPlayer player = new SoundPlayer("../../Sound/Capture.wav");
+                player.Play();
+            }
+            else
+            {
+                SoundPlayer player = new SoundPlayer("../../Sound/Move.wav");
+                player.Play();
+            }
         }
 
         private void SetSpecialRookProperties()
@@ -308,7 +338,7 @@ namespace Chess
 
         private void SetSpecialPawnProperties(Pawn pawn, string currentLegalMove)
         {
-            //if the delta of destination coordinate and source coordinate equals 2, then the move made was a double move. 
+            //If the delta of destination coordinate and source coordinate equals 2, then the move made was a double move. 
             //The coordinate behind the pawn is then saved as an eligible en passant square.
             if (model.DestinationY - model.YSourceCoordinate == 2)
             {
@@ -322,7 +352,7 @@ namespace Chess
                 model.EnPassantCoordinate[1] = model.XSourceCoordinate;
             }
 
-            if (currentLegalMove.Equals(model.EnPassantCoordinate[0] + " " + model.EnPassantCoordinate[1]))
+            else if (currentLegalMove.Equals(model.EnPassantCoordinate[0] + " " + model.EnPassantCoordinate[1]))
             {
                 if (pawn.isBlack)
                 {
@@ -334,6 +364,11 @@ namespace Chess
                     model.SpecialCaseCoordinates[0] = model.EnPassantCoordinate[0] + 1;
                     model.SpecialCaseCoordinates[1] = model.EnPassantCoordinate[1];
                 }
+            }
+            else
+            {
+                model.EnPassantCoordinate[0] = 9;
+                model.EnPassantCoordinate[1] = 9;
             }
 
             //If any pawn move is on the 0th or 7th rank then that means that the pawn is on the final file, which also means it should promote.

@@ -458,7 +458,11 @@ namespace Chess
                                 //Should a coordinate be an en passant square then add that coordinate
                                 else if (enPassantCoordinate[0] == (move.TempY + move.YOffset) && enPassantCoordinate[1] == (move.TempX + move.XOffset))
                                 {
-                                    currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
+                                    if (currentPiece.isBlack != board[enPassantCoordinate[0] + 1, enPassantCoordinate[1]].isBlack)
+                                    {
+                                        currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
+                                    }
+                                    
                                 }
 
                                 //set new values specific to diagonal moves
@@ -557,28 +561,41 @@ namespace Chess
         //removes capture squares that is protected by another square, document more
         private List<string> RemoveIllegalKingCaptureSquares(List<string> kingMoves, Piece king)
         {
-            string[] stringKingMoves = new string[2];
             var tempBoard = (Piece[,])board.Clone();
             int kingY;
             int kingX;
+
             List<string> illegalCoordinates = new List<string>();
             PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
 
             for (int i = 0; i < kingMoves.Count; i++)
             {
-                stringKingMoves = kingMoves[i].Split();
+                //Gets the current move that should be tested
+                string[] stringKingMoves = kingMoves[i].Split();
+
+                //Convert the coordinates to ints
                 kingY = int.Parse(stringKingMoves[0]);
                 kingX = int.Parse(stringKingMoves[1]);
 
+                //If one of the king's pseudo-legal moves is a piece, then...
                 if (!(board[kingY, kingX] is EmptySquare))
                 {
+                    //Check if the move is a piece of the opposite color
                     if (king.isBlack != tempBoard[kingY, kingX].isBlack)
                     {
+                        //Initiate the validation of kings by setting a boolean to true.
+                        //Afterwards the "new" position that would occur if the king moved
+                        //to the denoted position, gets tested using slightly altered
+                        //move parameters to see if any piece of the opposite color
+                        //attacks the square the king "would have" moved to if it was a legal position.
+                        //Should any position coincide with each other, then remove that coordinate from
+                        //the king's legal moves.
                         validateKingMoves = true;
                         var tempPiece = tempBoard[kingY, kingX];
                         tempBoard[kingY, kingX] = factory.CreatePiece('S', true) ;
                         var newBoard = GeneratePseudoLegalMoves(tempBoard, new List<int> { 9, 9 });
                         validateKingMoves = false;
+
                         if (IsCaptureSquareProtected(newBoard, kingMoves[i]))
                         {
                             illegalCoordinates.Add(kingMoves[i]);
@@ -589,6 +606,8 @@ namespace Chess
                 }
 
             }
+
+            //Removes any illegal squares that the previous method returned.
             for (int i = 0; i < illegalCoordinates.Count; i++)
             {
                 kingMoves.Remove(illegalCoordinates[i]);

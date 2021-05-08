@@ -27,4 +27,3 @@ C:\Users\fabian.aronsson1\Desktop\Skola\Github\Slutprojekt-Programmering-2\Chess
 C:\Users\fabian.aronsson1\Desktop\Skola\Github\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.exe
 C:\Users\fabian.aronsson1\Desktop\Skola\Github\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.pdb
 C:\Users\fabian.aronsson1\Desktop\Skola\Github\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.csprojAssemblyReference.cache
-D:\Skrivbord\Mapp\GitHub\Slutprojekt-Programmering-2\Chess\Chess\obj\Debug\Chess.csprojAssemblyReference.cache

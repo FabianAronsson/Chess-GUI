@@ -127,8 +127,8 @@
     <Resource Include="Images\wKing.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Sound\Capture.wav" />
-    <None Include="Sound\Move.wav" />
+    <Resource Include="Sound\Capture.wav" />
+    <Resource Include="Sound\Move.wav" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\DualTypeImages\DualBishop.png" />

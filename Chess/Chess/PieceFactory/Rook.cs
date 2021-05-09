@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chess.PieceFactory
 {
-    public class Rook : Piece
+    public class Rook : RayPiece
     {
         public override Piece CreatePiece()
         {

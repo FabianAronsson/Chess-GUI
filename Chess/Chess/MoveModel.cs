@@ -21,6 +21,8 @@ namespace Chess
             MaxValue = -1;
             DirValue = -1;
             N = -1;
+            XrayY = YOffset;
+            XrayX = XOffset;
 
         }
         public MoveModel(Bishop bishop, int y, int x)
@@ -38,6 +40,8 @@ namespace Chess
              DirValueX = -1;
              NY = -1;
              NX = -1;
+            XrayY = YOffset;
+            XrayX = XOffset;
         }
 
         public MoveModel(Knight knight, int y, int x)
@@ -113,5 +117,7 @@ namespace Chess
         public int NX { get; set; }
         public bool CanDoubleMove { get; set; }
 
+        public int XrayX { get; set; }
+        public int XrayY { get; set; }
     }
 }

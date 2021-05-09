@@ -77,6 +77,18 @@ namespace Chess
                     {
                         pawn.attckingSquares.Clear();
                     }
+                    else if (board[i, j] is Rook rook)
+                    {
+                        rook.attckingSquares.Clear();
+                    }
+                    else if(board[i, j] is Bishop bishop)
+                    {
+                        bishop.attckingSquares.Clear();
+                    }
+                    else if(board[i, j] is Queen queen)
+                    {
+                        queen.attckingSquares.Clear();
+                    }
                 }
 
             }
@@ -85,20 +97,21 @@ namespace Chess
         private Piece GenerateQueenMoves(Piece currentPiece, int y, int x)
         {
             List<string> legalMoves = new List<string>();
-
             //since a queen is just a bishop and a rook combinded, their respective methods can be used to generate pseudo-legal moves
-            legalMoves.AddRange(GenerateLateralMoves(currentPiece, y, x, 7).legalMoves);
-            legalMoves.AddRange(GenerateDiagonalMoves(currentPiece, y, x, 7).legalMoves);
-
+            Piece lateralPiece = GenerateLateralMoves(currentPiece, y, x, 7);
+            Piece diagonalPiece = GenerateDiagonalMoves(currentPiece, y, x, 7);
+            legalMoves.AddRange(lateralPiece.legalMoves);
+            legalMoves.AddRange(diagonalPiece.legalMoves);
             currentPiece.legalMoves = legalMoves;
+
             return currentPiece;
         }
 
         //todo, document this monster of a method.
         private Piece GenerateLateralMoves(Piece currentPiece, int y, int x, int maxLoopValue)
         {
-            Rook rook = currentPiece as Rook;
-            var move = new MoveModel(rook, y, x);
+            Rook startPiece = currentPiece as Rook;
+            var move = new MoveModel(startPiece, y, x);
 
             for (int i = 0; i < 4; i++)
             {
@@ -112,12 +125,16 @@ namespace Chess
                         move.MaxValue = 8;
                         move.N = 1;
                         move.IsPositiveOperation = true;
+                        move.XrayY = 0;
+                        move.XrayX = 1;
                         break;
                     case 2: //South
                         move.YOffset = 1;
                         move.XOffset = 0;
                         move.ActiveDirection = y;
                         move.IsPositiveOperation = true;
+                        move.XrayY = 1;
+                        move.XrayX = 0;
                         break;
                     case 3: //West
                         move.YOffset = 0;
@@ -127,6 +144,8 @@ namespace Chess
                         move.MaxValue = -1;
                         move.N = -1;
                         move.IsPositiveOperation = false;
+                        move.XrayY = 0;
+                        move.XrayX = -1;
                         break;
                     default:
                         break;
@@ -151,6 +170,21 @@ namespace Chess
                                 //If the next position is a piece, then no more moves can be generated for that direction.
                                 if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                                 {
+                                    if (currentPiece is Rook rook )
+                                    {
+                                        if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
+                                        {
+                                            rook.attckingSquares.Add((move.TempY + move.YOffset + move.XrayY) + " " + (move.TempX + move.XOffset + move.XrayX));
+                                        }
+                                    }
+                                    else if( currentPiece is Queen queen)
+                                    {
+                                        if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
+                                        {
+                                            queen.attckingSquares.Add((move.TempY + move.YOffset + move.XrayY) + " " + (move.TempX + move.XOffset + move.XrayX));
+                                        }
+                                    }
+
                                     break;
                                 }
 
@@ -187,6 +221,22 @@ namespace Chess
 
                                 if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                                 {
+                                    if (currentPiece is Rook rook)
+                                    {
+                                        if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
+                                        {
+                                            rook.attckingSquares.Add((move.TempY + move.YOffset + move.XrayY) + " " + (move.TempX + move.XOffset + move.XrayX));
+                                        }
+                                        
+                                    }
+                                    else if (currentPiece is Queen queen)
+                                    {
+                                        if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
+                                        {
+                                            queen.attckingSquares.Add((move.TempY + move.YOffset + move.XrayY) + " " + (move.TempX + move.XOffset + move.XrayX));
+                                        }
+                                    }
+
                                     break;
                                 }
 
@@ -216,8 +266,8 @@ namespace Chess
         //todo, document this monster of a method.
         private Piece GenerateDiagonalMoves(Piece currentPiece, int y, int x, int maxLoopValue)
         {
-            Bishop bishop = currentPiece as Bishop;
-            var move = new MoveModel(bishop, y, x);
+            Bishop startPiece = currentPiece as Bishop;
+            var move = new MoveModel(startPiece, y, x);
 
             //delegates for choosing what operation to use
             Func<int, int, bool> greaterThanDelegate = (a, b) => a > b;
@@ -241,6 +291,8 @@ namespace Chess
                         move.MaxValueX = 8;
                         move.NY = -1;
                         move.NX = 1;
+                        move.XrayY = move.YOffset;
+                        move.XrayX = move.XOffset;
                         operationY = greaterThanDelegate;
                         operationX = lessThanDelegate;
                         break;
@@ -255,6 +307,8 @@ namespace Chess
                         move.MaxValueX = 8;
                         move.NY = 1;
                         move.NX = 1;
+                        move.XrayY = move.YOffset;
+                        move.XrayX = move.XOffset;
                         operationY = lessThanDelegate;
                         operationX = lessThanDelegate;
                         break;
@@ -269,6 +323,8 @@ namespace Chess
                         move.MaxValueX = -1;
                         move.NY = 1;
                         move.NX = -1;
+                        move.XrayY = move.YOffset;
+                        move.XrayX = move.XOffset;
                         operationY = lessThanDelegate;
                         operationX = greaterThanDelegate;
                         break;
@@ -292,6 +348,20 @@ namespace Chess
 
                             if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                             {
+                                if (currentPiece is Bishop bishop)
+                                {
+                                    if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
+                                    {
+                                        bishop.attckingSquares.Add((move.TempY + move.YOffset + move.XrayY) + " " + (move.TempX + move.XOffset + move.XrayX));
+                                    }
+                                }
+                                if (currentPiece is Queen queen)
+                                {
+                                    if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
+                                    {
+                                        queen.attckingSquares.Add((move.TempY + move.YOffset + move.XrayY) + " " + (move.TempX + move.XOffset + move.XrayX));
+                                    }
+                                }
                                 break;
                             }
                             move.XOffset += move.NX;
@@ -726,6 +796,8 @@ namespace Chess
         {
             List<string> coordinatesToBeDeleted = new List<string>(kingMoves.Count);
 
+            //Since a pawn only can attack diagonally, it's special case need to be
+            //addressed first as a pawns legal move is not the move which it can atttack with.
             if (selectedPiece is Pawn pawn)
             {
                 for (int i = 0; i < pawn.attckingSquares.Count; i++)
@@ -762,6 +834,13 @@ namespace Chess
                 }
             }
 
+            if (selectedPiece is Rook || selectedPiece is Bishop || selectedPiece is Queen)
+            {
+                coordinatesToBeDeleted.AddRange(RemoveXraySquaresFromKing(selectedPiece, kingMoves));
+                coordinatesToBeDeleted.Distinct().ToList();
+            }
+
+
 
             //delete previous pseudo-legal moves for the current king
             for (int i = 0; i < coordinatesToBeDeleted.Count; i++)
@@ -770,6 +849,25 @@ namespace Chess
             }
 
             return kingMoves;
+        }
+
+        private List<string> RemoveXraySquaresFromKing(Piece selectedPiece, List<string> kingMoves)
+        {
+            List<string> coordinatesToBeDeleted = new List<string>(kingMoves.Count);
+
+            if (selectedPiece is RayPiece rayPiece)
+            {
+                for (int i = 0; i < rayPiece.attckingSquares.Count; i++)
+                {
+                    if (kingMoves.Contains(rayPiece.attckingSquares[i]))
+                    {
+                        coordinatesToBeDeleted.Add(rayPiece.attckingSquares[i]);
+                    }
+                }
+            }
+            
+
+            return coordinatesToBeDeleted;
         }
 
         public string CheckCastlingSquares(string castlingSquare)

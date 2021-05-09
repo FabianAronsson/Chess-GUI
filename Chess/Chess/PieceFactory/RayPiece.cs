@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace Chess.PieceFactory
 {
-    public class Queen : RayPiece
+    public class RayPiece : Piece
     {
+        public List<string> attckingSquares = new List<string>();
+
         public override Piece CreatePiece()
         {
-            return new Queen();
+            return new RayPiece();
         }
     }
 }

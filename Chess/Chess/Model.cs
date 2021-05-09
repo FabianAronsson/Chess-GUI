@@ -42,7 +42,7 @@ namespace Chess
         }
         
         //standard setup for chess, can be substituted for any position
-        private string FEN = "8/8/8/8/8/2Kp4/5N2/Q7 w - - 0 1";
+        private string FEN = "8/8/1b4b1/8/3K4/8/8/8 w - - 0 1";
 
         public string FENotation
         {

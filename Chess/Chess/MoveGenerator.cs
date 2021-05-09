@@ -81,16 +81,15 @@ namespace Chess
                     {
                         rook.attckingSquares.Clear();
                     }
-                    else if(board[i, j] is Bishop bishop)
+                    else if (board[i, j] is Bishop bishop)
                     {
                         bishop.attckingSquares.Clear();
                     }
-                    else if(board[i, j] is Queen queen)
+                    else if (board[i, j] is Queen queen)
                     {
                         queen.attckingSquares.Clear();
                     }
                 }
-
             }
         }
 
@@ -170,14 +169,14 @@ namespace Chess
                                 //If the next position is a piece, then no more moves can be generated for that direction.
                                 if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                                 {
-                                    if (currentPiece is Rook rook )
+                                    if (currentPiece is Rook rook)
                                     {
                                         if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
                                         {
                                             rook.attckingSquares.Add((move.TempY + move.YOffset + move.XrayY) + " " + (move.TempX + move.XOffset + move.XrayX));
                                         }
                                     }
-                                    else if( currentPiece is Queen queen)
+                                    else if (currentPiece is Queen queen)
                                     {
                                         if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
                                         {
@@ -227,7 +226,7 @@ namespace Chess
                                         {
                                             rook.attckingSquares.Add((move.TempY + move.YOffset + move.XrayY) + " " + (move.TempX + move.XOffset + move.XrayX));
                                         }
-                                        
+
                                     }
                                     else if (currentPiece is Queen queen)
                                     {
@@ -865,7 +864,7 @@ namespace Chess
                     }
                 }
             }
-            
+
 
             return coordinatesToBeDeleted;
         }

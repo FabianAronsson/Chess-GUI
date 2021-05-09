@@ -82,7 +82,7 @@ namespace Chess
         //todo document method
         private void HideLegalMoves(Piece piece)
         {
-            List<string> legalMoves = piece.legalMoves;
+            List<string> legalMoves = new List<string>(piece.legalMoves);
             string[] currentPosition = new string[2];
 
             for (int i = 0; i < legalMoves.Count; i++)
@@ -114,8 +114,10 @@ namespace Chess
                 }
                 else //user tried making an illegal move
                 {
-                    controller.ResetPieceValues();
+                    controller.GenerateLegalMoves();
                     HideLegalMoves(controller.GetSourcePiece());
+                   
+                    controller.ResetPieceValues();
                 }
 
             }

@@ -152,7 +152,17 @@ namespace Chess
                 {
                     if (piece.legalMoves[i] == destinationCoords)
                     {
-
+                        if (IsMoveIllegal(piece) && !(piece is King))
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            //due to a reference bug, the actual board is somehow being edited. This means that
+                            //new moves has to be generated again because the previously legal moves are now heavily inaccurate.
+                            GenerateLegalMoves();
+                        }
+                        
                         //Special cases for pawns
                         if (piece is Pawn pawn)
                         {
@@ -181,7 +191,7 @@ namespace Chess
                             model.IsItBlackToMove = true;
                         }
 
-                        PlaySound(piece.isBlack, destinationCoords);
+                        PlaySound(piece.isBlack);
 
                         return true;
                     }
@@ -190,22 +200,45 @@ namespace Chess
             return false;
         }
 
-        private bool DetermineTypeOfMove(bool isBlack, string destinationCoords)
+        private bool IsMoveIllegal(Piece currentPiece)
         {
-            if (isBlack != model.InternalBoard[model.DestinationY, model.DestinationX].isBlack && !(model.InternalBoard[model.DestinationY, model.DestinationX] is EmptySquare))
+            
+            Piece[,] tempBoard = (Piece[,])model.InternalBoard.Clone();
+            MoveGenerator generate = new MoveGenerator();
+            PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
+            tempBoard[model.DestinationY, model.DestinationX] = currentPiece;
+            tempBoard[model.YSourceCoordinate, model.XSourceCoordinate] = factory.CreatePiece('S', true);
+            bool isBlack = currentPiece.isBlack;
+            tempBoard = (Piece[,])generate.GeneratePseudoLegalMoves(tempBoard, model.EnPassantCoordinate).Clone();
+            string kingCoordinates = GetKingCoordinates(isBlack);
+            
+            //check if any "legal moves" of the opposite color equals the king coordinate.
+            for (int i = 0; i < 8; i++)
             {
-                return true;
+                for (int j = 0; j < 8; j++)
+                {
+                    if (!(tempBoard[i, j] is EmptySquare) && !(tempBoard[i, j] is King))
+                    {
+                        if (tempBoard[i, j].legalMoves.Contains(kingCoordinates))
+                        {
+                            return true;
+                        }
+                    }
+                    
+                }
             }
-            else
-            {
-                return false;
-            }
+            tempBoard[model.DestinationY, model.DestinationX] = factory.CreatePiece('S', true);
+            tempBoard[model.YSourceCoordinate, model.XSourceCoordinate] = currentPiece ;
+
+            
+
+            return false;
         }
 
-        private void PlaySound(bool isBlack, string destinationCoords)
+        private void PlaySound(bool isBlack)
         {
 
-            if (DetermineTypeOfMove(isBlack, destinationCoords))
+            if (DetermineTypeOfMove(isBlack))
             {
                 SoundPlayer player = new SoundPlayer("../../Sound/Capture.wav");
                 player.Play();
@@ -214,6 +247,54 @@ namespace Chess
             {
                 SoundPlayer player = new SoundPlayer("../../Sound/Move.wav");
                 player.Play();
+            }
+        }
+
+        private bool IsKingUnderAttack(bool isBlack)
+        {
+            string kingCoordinates = GetKingCoordinates(isBlack);
+            //check if any "legal moves" of the opposite color equals the king coordinate.
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (!(model.InternalBoard[i, j] is EmptySquare) && !(model.InternalBoard[i, j] is King))
+                    {
+                        if (model.InternalBoard[i, j].legalMoves.Contains(kingCoordinates))
+                        {
+                            return true;
+                        }
+                    }
+
+                }
+            }
+            return false;
+        }
+
+        private string GetKingCoordinates(bool isBlack)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (model.InternalBoard[i, j] is King && model.InternalBoard[i, j].isBlack == isBlack)
+                    {
+                        return i + " " + j;
+                    }
+                }
+            }
+            return "";
+        }
+
+        private bool DetermineTypeOfMove(bool isBlack)
+        {
+            if (isBlack != model.InternalBoard[model.DestinationY, model.DestinationX].isBlack && !(model.InternalBoard[model.DestinationY, model.DestinationX] is EmptySquare))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -444,7 +525,7 @@ namespace Chess
         public void GenerateLegalMoves()
         {
             MoveGenerator generate = new MoveGenerator();
-            generate.GeneratePseudoLegalMoves(model.InternalBoard, model.EnPassantCoordinate);
+            model.InternalBoard = (Piece[,])generate.GeneratePseudoLegalMoves(model.InternalBoard, model.EnPassantCoordinate).Clone();
         }
 
         public List<int> GetSpecialCaseCoordinates()

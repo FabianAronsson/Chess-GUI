@@ -72,6 +72,11 @@ namespace Chess
                 for (int j = 0; j < 8; j++)
                 {
                     board[i, j].legalMoves.Clear();
+
+                    if (board[i, j] is Pawn pawn)
+                    {
+                        pawn.attckingSquares.Clear();
+                    }
                 }
 
             }
@@ -398,7 +403,7 @@ namespace Chess
             var newOppositeOperationX = lessThanDelegate;
 
             //set position specific values for white
-            if (!currentPiece.isBlack)
+            if (!pawn.isBlack)
             {
                 move = new MoveModel(pawn, y, x, false);
                 operationY = greaterThanDelegate;
@@ -411,7 +416,7 @@ namespace Chess
                     if (operationY(move.ActiveDirectionY + move.DirValueY, move.MaxValueY) && operationX(move.ActiveDirectionX + move.DirValueX, move.MaxValueX))
                     {
                         //Checks whether or not the next square is a piece of the same color and if its a piece on the square
-                        if (currentPiece.isBlack == board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
+                        if (pawn.isBlack == board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                         {
                             break;
                         }
@@ -422,16 +427,16 @@ namespace Chess
                             if (!isDiagonalMove)
                             {
                                 //If the next position is a piece, then no more moves can be generated for that direction.
-                                if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
+                                if (pawn.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                                 {
                                     break;
                                 }
-                                //Check if pawn can do double move
+                                //Check if pawn can do double move on the second and seventh rank.
                                 if (y == 1 || y == 6)
                                 {
                                     if (pawn.canDoubleMove && move.CanDoubleMove && j == 1)
                                     {
-                                        currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
+                                        pawn.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                                         move.CanDoubleMove = false;
                                         break;
                                     }
@@ -444,25 +449,30 @@ namespace Chess
                                 {
                                     break;
                                 }
-                                currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
+                                pawn.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                                 move.YOffset += move.NY;
                                 move.ActiveDirectionY += move.NY;
                             }
                             else
                             {
                                 //If the next position for a diagonal move is a piece of the opposite color, add it to the list of legalmoves.
-                                if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
+                                if (pawn.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                                 {
-                                    currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
+                                    pawn.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                                 }
                                 //Should a coordinate be an en passant square then add that coordinate
                                 else if (enPassantCoordinate[0] == (move.TempY + move.YOffset) && enPassantCoordinate[1] == (move.TempX + move.XOffset))
                                 {
-                                    if (currentPiece.isBlack != board[enPassantCoordinate[0] + 1, enPassantCoordinate[1]].isBlack)
+                                    if (pawn.isBlack != board[enPassantCoordinate[0] + 1, enPassantCoordinate[1]].isBlack)
                                     {
-                                        currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
+                                        pawn.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                                     }
-                                    
+
+                                }
+                                //If no normally legal moves are found for the pawn, then the attacking positions for a pawn is saved for king move validation.
+                                else
+                                {
+                                    pawn.attckingSquares.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                                 }
 
                                 //set new values specific to diagonal moves
@@ -493,7 +503,7 @@ namespace Chess
                     }
                 }
                 isDiagonalMove = true;
-                if (currentPiece.isBlack)
+                if (pawn.isBlack)
                 {
                     //set new values for black pawns
                     move.YOffset = 1;
@@ -522,7 +532,7 @@ namespace Chess
                     operationX = newOperationX;
                 }
             }
-            return currentPiece; // check so it is working, was "pawn" before.
+            return pawn;
         }
 
         //document
@@ -592,14 +602,14 @@ namespace Chess
                         //the king's legal moves.
                         validateKingMoves = true;
                         var tempPiece = tempBoard[kingY, kingX];
-                        tempBoard[kingY, kingX] = factory.CreatePiece('S', true) ;
+                        tempBoard[kingY, kingX] = factory.CreatePiece('S', true);
                         var newBoard = GeneratePseudoLegalMoves(tempBoard, new List<int> { 9, 9 });
                         validateKingMoves = false;
 
                         if (IsCaptureSquareProtected(newBoard, kingMoves[i]))
                         {
                             illegalCoordinates.Add(kingMoves[i]);
-                            
+
                         }
                         tempBoard[kingY, kingX] = tempPiece;
                     }
@@ -631,8 +641,15 @@ namespace Chess
                         {
                             return true;
                         }
+                        else if (board[i, j] is Pawn pawn)
+                        {
+                            if (pawn.attckingSquares.Contains(currentMove))
+                            {
+                                return true;
+                            }
+                        }
                     }
-                    
+
                 }
             }
             return false;
@@ -708,29 +725,43 @@ namespace Chess
         private List<string> RemoveIllegalSquaresForKing(List<string> kingMoves, Piece selectedPiece)
         {
             List<string> coordinatesToBeDeleted = new List<string>(kingMoves.Count);
-            for (int i = 0; i < kingMoves.Count; i++)
+
+            if (selectedPiece is Pawn pawn)
             {
-                string kingmove = kingMoves[i];
-                for (int j = 0; j < selectedPiece.legalMoves.Count; j++)
+                for (int i = 0; i < pawn.attckingSquares.Count; i++)
                 {
-                    //if any of the kings pseudo-legal squares is equal to ANY of the selectedPiece's 
-                    //legal squares, then that means the pseudo-legal move is illegal.
-                    if (kingmove.Equals(selectedPiece.legalMoves[j]))
+                    if (kingMoves.Contains(pawn.attckingSquares[i]))
                     {
-                        coordinatesToBeDeleted.Add(kingmove);
-
-                        //If any of the kings first x-axis moves comes through in the previous 
-                        //if statement then it must mean that the next move also is an illegal 
-                        //square since a king cannot castle through a check.
-                        if (kingmove.Equals(0 + " " + 5) || kingmove.Equals(0 + " " + 3) || kingmove.Equals(7 + " " + 5) || kingmove.Equals(7 + " " + 3))
-                        {
-                            coordinatesToBeDeleted.Add(CheckCastlingSquares(kingmove));
-                        }
-
-                        break;
+                        coordinatesToBeDeleted.Add(pawn.attckingSquares[i]);
                     }
                 }
             }
+            else
+            {
+                for (int i = 0; i < kingMoves.Count; i++)
+                {
+                    string kingmove = kingMoves[i];
+                    for (int j = 0; j < selectedPiece.legalMoves.Count; j++)
+                    {
+                        //if any of the kings pseudo-legal squares is equal to ANY of the selectedPiece's 
+                        //legal squares, then that means the pseudo-legal move is illegal.
+                        if (kingmove.Equals(selectedPiece.legalMoves[j]))
+                        {
+                            coordinatesToBeDeleted.Add(kingmove);
+
+                            //If any of the kings first x-axis moves comes through in the previous 
+                            //if statement then it must mean that the next move also is an illegal 
+                            //square since a king cannot castle through a check.
+                            if (kingmove.Equals(0 + " " + 5) || kingmove.Equals(0 + " " + 3) || kingmove.Equals(7 + " " + 5) || kingmove.Equals(7 + " " + 3))
+                            {
+                                coordinatesToBeDeleted.Add(CheckCastlingSquares(kingmove));
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
 
             //delete previous pseudo-legal moves for the current king
             for (int i = 0; i < coordinatesToBeDeleted.Count; i++)

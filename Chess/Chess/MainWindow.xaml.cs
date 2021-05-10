@@ -114,6 +114,7 @@ namespace Chess
                     controller.GenerateLegalMoves();
                     controller.PlaySound(controller.GetDestinationPiece().isBlack, true);
                     controller.ResetPieceValues();
+                    IsGameOver();
                 }
                 else //user tried making an illegal move
                 {
@@ -124,6 +125,24 @@ namespace Chess
                 }
 
             }
+        }
+
+        private void IsGameOver()
+        {
+            if (!controller.DoesNextPlayerHaveLegalMoves())
+            {
+                GameOver.IsOpen = true;
+            }
+        }
+
+        private void ExitGame(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void ClosePopup(object sender, RoutedEventArgs e)
+        {
+            GameOver.IsOpen = false;
         }
 
         //todo document method

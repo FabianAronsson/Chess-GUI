@@ -162,7 +162,7 @@ namespace Chess
                             //new moves has to be generated again because the previously legal moves are now heavily inaccurate.
                             GenerateLegalMoves();
                         }
-                        
+
                         //Special cases for pawns
                         if (piece is Pawn pawn)
                         {
@@ -180,7 +180,7 @@ namespace Chess
                         {
                             SetSpecialRookProperties();
                         }
-                        
+
                         //Change turn order
                         if (piece.isBlack)
                         {
@@ -190,9 +190,6 @@ namespace Chess
                         {
                             model.IsItBlackToMove = true;
                         }
-                        
-
-
                         return true;
                     }
                 }
@@ -200,17 +197,66 @@ namespace Chess
             return false;
         }
 
+        public bool DoesNextPlayerHaveLegalMoves()
+        {
+            bool isBlack;
+            if (!model.IsItBlackToMove)
+            {
+                isBlack = false;
+            }
+            else
+            {
+                isBlack = true;
+            }
+
+            King tempKing = null;
+            if (IsKingUnderAttack(isBlack))
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 0; j < 8; j++)
+                    {
+                        if (model.InternalBoard[i, j].isBlack == isBlack && !(model.InternalBoard[i, j] is EmptySquare))
+                        {
+                            if (model.InternalBoard[i, j] is King king)
+                            {
+                                tempKing = king;
+                            }
+                            
+                            if (IsMoveIllegal(model.InternalBoard[i, j]))
+                            {
+                                return false;
+                            }
+                            GenerateLegalMoves();
+                        }
+                    }
+                }
+            }
+
+            if (tempKing != null && tempKing.legalMoves.Count == 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+       
+
         private bool IsMoveIllegal(Piece currentPiece)
         {
             Piece[,] tempBoard = (Piece[,])model.InternalBoard.Clone();
             MoveGenerator generate = new MoveGenerator();
             PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
+
             tempBoard[model.DestinationY, model.DestinationX] = currentPiece;
             tempBoard[model.YSourceCoordinate, model.XSourceCoordinate] = factory.CreatePiece('S', true);
+
             bool isBlack = currentPiece.isBlack;
+
             tempBoard = (Piece[,])generate.GeneratePseudoLegalMoves(tempBoard, model.EnPassantCoordinate).Clone();
             string kingCoordinates = GetKingCoordinates(isBlack);
-            
+
             //check if any "legal moves" of the opposite color equals the king coordinate.
             for (int i = 0; i < 8; i++)
             {
@@ -223,13 +269,11 @@ namespace Chess
                             return true;
                         }
                     }
-                    
+
                 }
             }
             tempBoard[model.DestinationY, model.DestinationX] = factory.CreatePiece('S', true);
-            tempBoard[model.YSourceCoordinate, model.XSourceCoordinate] = currentPiece ;
-
-            
+            tempBoard[model.YSourceCoordinate, model.XSourceCoordinate] = currentPiece;
 
             return false;
         }
@@ -257,9 +301,9 @@ namespace Chess
                     player.Play();
                 }
             }
-            
-            
-            
+
+
+
         }
 
         private bool IsKingUnderAttack(bool isBlack)

@@ -63,7 +63,7 @@
                 </Button>
                 <Button Click="ChoosePieceButtonClick" Tag="Queen" Grid.Column="3" HorizontalAlignment="Left" Width="100" Height="100" Background="White" BorderBrush="{x:Null}">
                     <Image Source="Images/DualTypeImages/DualQueen.png"/>
-                    
+
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
                             <Setter Property="Background" Value="white"/>
@@ -75,13 +75,49 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-
                 </Button>
-
-
             </Grid>
+        </Popup>
 
+        <Popup Name="GameOver"
+
+               Placement="Mouse"
+
+               HorizontalOffset="-100"
+               IsOpen="False"
+               VerticalOffset="-100"
+
+               AllowsTransparency="True">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+
+                <Ellipse Width="800" Height="400" Fill="White" Grid.ColumnSpan="4"/>
+                <TextBlock Margin="50" FontSize="30" Grid.Column="0" Width="290" Height="120">Gameover? <LineBreak /> The game might have <LineBreak />more positions. . .</TextBlock>
+                <Button Click="ClosePopup" FontSize="26" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Width="150" Height="150" Background="Green" BorderBrush="{x:Null}">
+                    Continue.
+                </Button>
+                <Button Click="ExitGame" FontSize="26" Grid.Column="2" HorizontalAlignment="Left" Width="150" Height="150" Background="Red" BorderBrush="{x:Null}">
+                    Exit.
+
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Background" Value="white"/>
+
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="white"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
         </Popup>
     </Grid>
-    
 </Window>

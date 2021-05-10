@@ -12,6 +12,8 @@ namespace Chess.PieceFactory
         public bool canCastleK = true;
         public bool canCastleQ = true;
 
+        public List<string> attckingSquares = new List<string>();
+
         public override Piece CreatePiece()
         {
             return new King();

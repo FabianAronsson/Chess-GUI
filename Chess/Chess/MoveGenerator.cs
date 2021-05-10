@@ -57,11 +57,13 @@ namespace Chess
                         var currentPiece = board[i, j];
                         if (board[i, j].typeOfPiece.Equals("King"))
                         {
-                            board[i, j] = GenerateKingMoves(currentPiece, i, j);
+                            board[i, j] = GenerateKingMoves(currentPiece as King, i, j);
                         }
                     }
                 }
             }
+
+            board = (Piece[,])RemoveOppositeKingAttackingSquares(board).Clone();
             return board; //not actually neccessary
         }
 
@@ -88,6 +90,10 @@ namespace Chess
                     else if (board[i, j] is Queen queen)
                     {
                         queen.attckingSquares.Clear();
+                    }
+                    else if (board[i, j] is King king)
+                    {
+                        king.attckingSquares.Clear();
                     }
                 }
             }
@@ -605,11 +611,31 @@ namespace Chess
         }
 
         //document
-        private Piece GenerateKingMoves(Piece currentPiece, int y, int x)
+        private Piece GenerateKingMoves(King currentPiece, int y, int x)
         {
             List<string> kingMoves = GenerateLateralKingMoves(currentPiece, y, x);
             kingMoves.AddRange(GenerateDiagonalKingMoves(currentPiece, y, x));
             kingMoves.AddRange(GetKingCastleCoordinates(currentPiece, y, x));
+
+            kingMoves.Distinct().ToList();
+            List<string> attackingSquares = new List<string>();
+            attackingSquares.AddRange(kingMoves);
+
+            for (int i = 0; i < attackingSquares.Count; i++)
+            {
+                for (int j = 0; j < attackingSquares.Count - 1; j++)
+                {
+                    if (attackingSquares[0].Equals(attackingSquares[j + 1]))
+                    {
+                        attackingSquares.Remove(attackingSquares[0]);
+
+                        break;
+                    }
+                }
+
+            }
+
+            currentPiece.attckingSquares = new List<string>(attackingSquares);
 
             //due to a "bug" with "AddRange", duplicate values were assigned, creating a need for distinct values
             kingMoves = kingMoves.Distinct().ToList();
@@ -619,17 +645,17 @@ namespace Chess
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    if (!board[i, j].typeOfPiece.Equals("King"))
+                    // if (!board[i, j].typeOfPiece.Equals("King"))
+                    // {
+                    if (!(board[i, j] is EmptySquare))
                     {
-                        if (!(board[i, j] is EmptySquare))
+                        var selectedPiece = board[i, j];
+                        if (currentPiece.isBlack != board[i, j].isBlack)
                         {
-                            var selectedPiece = board[i, j];
-                            if (currentPiece.isBlack != board[i, j].isBlack)
-                            {
-                                kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);
-                            }
+                            kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);
                         }
                     }
+                    // }
                 }
             }
             currentPiece.legalMoves = RemoveIllegalKingCaptureSquares(kingMoves, currentPiece);
@@ -709,6 +735,13 @@ namespace Chess
                         if (board[i, j].legalMoves.Contains(currentMove))
                         {
                             return true;
+                        }
+                        else if (board[i, j] is King king)
+                        {
+                            if (king.attckingSquares.Contains(currentMove))
+                            {
+                                return true;
+                            }
                         }
                         else if (board[i, j] is Pawn pawn)
                         {
@@ -790,6 +823,56 @@ namespace Chess
             return castleCoordinates;
         }
 
+        private Piece[,] RemoveOppositeKingAttackingSquares(Piece[,] chessBoard)
+        {
+            King king = null;
+            King oppositeKing = null;
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (chessBoard[i, j] is King && !chessBoard[i, j].isBlack)
+                    {
+                        king = (King)chessBoard[i, j];
+                    }
+                    else if (chessBoard[i, j] is King && chessBoard[i, j].isBlack)
+                    {
+                        oppositeKing = (King)chessBoard[i, j];
+                    }
+                }
+
+            }
+
+            if (!(king == null || oppositeKing == null)) //due to a bug, the kings sometimes does not appear on the board, this also means that some illegal moves are legal
+            {
+                King currentKing = king;
+                bool isBothKingsValidated = false;
+
+                for (int i = 0; i < currentKing.attckingSquares.Count; i++)
+                {
+                    for (int j = 0; j < oppositeKing.attckingSquares.Count; j++)
+                    {
+                        if (currentKing.attckingSquares.Contains(oppositeKing.attckingSquares[j]))
+                        {
+                            currentKing.legalMoves.Remove(oppositeKing.attckingSquares[j]);
+                        }
+                    }
+
+                    if (i == currentKing.legalMoves.Count && !isBothKingsValidated)
+                    {
+                        currentKing = oppositeKing;
+                        currentKing.attckingSquares.Distinct().ToList();
+                        oppositeKing = king;
+                        i = 0;
+                        isBothKingsValidated = true;
+                    }
+                }
+            }
+
+            return chessBoard;
+        }
+
         //document
         private List<string> RemoveIllegalSquaresForKing(List<string> kingMoves, Piece selectedPiece)
         {
@@ -804,6 +887,7 @@ namespace Chess
                     if (kingMoves.Contains(pawn.attckingSquares[i]))
                     {
                         coordinatesToBeDeleted.Add(pawn.attckingSquares[i]);
+
                     }
                 }
             }

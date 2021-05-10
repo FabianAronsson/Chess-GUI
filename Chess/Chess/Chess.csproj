@@ -139,5 +139,8 @@
     <Resource Include="Images\DualTypeImages\DualQueen.png" />
     <Resource Include="Images\DualTypeImages\DualRook.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Sound\Check.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

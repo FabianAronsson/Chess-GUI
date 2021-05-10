@@ -190,8 +190,8 @@ namespace Chess
                         {
                             model.IsItBlackToMove = true;
                         }
+                        
 
-                        PlaySound(piece.isBlack);
 
                         return true;
                     }
@@ -202,7 +202,6 @@ namespace Chess
 
         private bool IsMoveIllegal(Piece currentPiece)
         {
-            
             Piece[,] tempBoard = (Piece[,])model.InternalBoard.Clone();
             MoveGenerator generate = new MoveGenerator();
             PieceFactory.PieceFactory factory = new PieceFactory.PieceFactory();
@@ -235,19 +234,32 @@ namespace Chess
             return false;
         }
 
-        private void PlaySound(bool isBlack)
+        public void PlaySound(bool isBlack, bool isCheck)
         {
-
-            if (DetermineTypeOfMove(isBlack))
+            if (isCheck)
             {
-                SoundPlayer player = new SoundPlayer("../../Sound/Capture.wav");
-                player.Play();
+                if (IsKingUnderAttack(!isBlack))
+                {
+                    SoundPlayer player = new SoundPlayer("../../Sound/Check.wav");
+                    player.Play();
+                }
             }
             else
             {
-                SoundPlayer player = new SoundPlayer("../../Sound/Move.wav");
-                player.Play();
+                if (DetermineTypeOfMove(isBlack))
+                {
+                    SoundPlayer player = new SoundPlayer("../../Sound/Capture.wav");
+                    player.Play();
+                }
+                else
+                {
+                    SoundPlayer player = new SoundPlayer("../../Sound/Move.wav");
+                    player.Play();
+                }
             }
+            
+            
+            
         }
 
         private bool IsKingUnderAttack(bool isBlack)
@@ -509,7 +521,11 @@ namespace Chess
         public Piece GetSourcePiece()
         {
             return model.InternalBoard[model.YSourceCoordinate, model.XSourceCoordinate];
+        }
 
+        public Piece GetDestinationPiece()
+        {
+            return model.InternalBoard[model.DestinationY, model.DestinationX];
         }
 
         public List<int> GetDestinationCoordinates()

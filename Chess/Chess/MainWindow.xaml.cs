@@ -106,10 +106,13 @@ namespace Chess
                     {
                         ShowPopup();
                     }
-
+                    controller.PlaySound(controller.GetSourcePiece().isBlack, false);
                     UpdateBoard(); //move piece
 
+                    
+
                     controller.GenerateLegalMoves();
+                    controller.PlaySound(controller.GetDestinationPiece().isBlack, true);
                     controller.ResetPieceValues();
                 }
                 else //user tried making an illegal move

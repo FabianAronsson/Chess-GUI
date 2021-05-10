@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,6 +8,15 @@ namespace Chess.PieceFactory
 {
     public class PieceFactory : IPieceFactory
     {
+        /// <summary>
+        /// Creates a piece a specific piece depending on what kind of char that is taken in. Depending on the char a specific
+        /// piece is created. What the chars means can be seen in the FEN-Notation wiki.
+        /// 
+        /// https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+        /// </summary>
+        /// <param name="typeOfPiece">The type of piece to be created</param>
+        /// <param name="isBlack">What color the piece should have</param>
+        /// <returns></returns>
         public Piece CreatePiece(char typeOfPiece, bool isBlack)
         {
             switch (typeOfPiece)
@@ -172,7 +177,7 @@ namespace Chess.PieceFactory
                         Background = Brushes.Transparent,
                         BorderThickness = new Thickness(0)
                     };
-                    
+
                 case 'S':
                     return new EmptySquare
                     {
@@ -180,7 +185,6 @@ namespace Chess.PieceFactory
                         isSpecialPiece = isBlack, //Inaccurate naming, but works
                         Background = Brushes.Transparent,
                         BorderThickness = new Thickness(0),
-                        //OverridesDefaultStyle = true
                     };
                 default:
                     return null;

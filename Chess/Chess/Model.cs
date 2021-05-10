@@ -1,10 +1,5 @@
 ﻿using Chess.PieceFactory;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace Chess
 {
@@ -40,9 +35,9 @@ namespace Chess
             get { return destY; }
             set { destY = value; }
         }
-        
+
         //standard setup for chess, can be substituted for any position
-        private string FEN = "7K/5k2/8/8/6q1/8/3B4/8 w - - 0 1";
+        private string FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
         public string FENotation
         {
@@ -82,7 +77,7 @@ namespace Chess
             set { destinationPiece = value; }
         }
 
-        private List<int> enPassantSquare = new List<int> { 9, 9}; //DEBUG COORDINATES
+        private List<int> enPassantSquare = new List<int> { 9, 9 }; //Arbitrary numbers
 
         public List<int> EnPassantCoordinate
         {
@@ -90,7 +85,7 @@ namespace Chess
             set { enPassantSquare = value; }
         }
 
-        private List<int> specialCaseCoordinates = new List<int> { 9, 9 };
+        private List<int> specialCaseCoordinates = new List<int> { 9, 9 }; //Arbitrary numbers
 
         public List<int> SpecialCaseCoordinates
         {
@@ -121,7 +116,5 @@ namespace Chess
             get { return promotionPiece; }
             set { promotionPiece = value; }
         }
-
-
     }
 }

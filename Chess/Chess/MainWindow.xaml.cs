@@ -1,18 +1,9 @@
 ﻿using Chess.PieceFactory;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Chess
 {
@@ -28,8 +19,6 @@ namespace Chess
             InitializeComponent();
             controller = Controller.InitMainController();
             viewModel = new ViewModel();
-            //CreateBoard();
-
         }
 
         //Event handler for creating the board. Instead of including it in the constructor for Mainwindow, 
@@ -40,6 +29,13 @@ namespace Chess
             controller.GenerateLegalMoves();
         }
 
+        /// <summary>
+        /// Every time a piece is moved the coordinates of that piece is saved, and every subsequent call is saved as a destination coordinate.
+        /// If it is the first time this method is called per sourcepiece then it will call on a method that displays the piece's legal moves. Finally
+        /// it also calls on a method to check if the move is legal.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MovePiece(object sender, RoutedEventArgs e)
         {
             if (viewModel.RunEventHandler)
@@ -65,7 +61,13 @@ namespace Chess
 
         }
 
-        //todo document method
+        /// <summary>
+        /// Displays legal moves based on the piece's legal moves. Every square that corresponds to the piece's legal moves is painted red 
+        /// to highlight to the user where the piece can move. 
+        /// 
+        /// Grid.Children getter from: https://stackoverflow.com/questions/1511722/how-to-programmatically-access-control-in-wpf-grid-by-row-and-column-index 
+        /// </summary>
+        /// <param name="piece">The piece's legal moves to update visually.</param>
         private void DisplayLegalMoves(Piece piece)
         {
             List<string> legalMoves = piece.legalMoves;
@@ -79,7 +81,13 @@ namespace Chess
             }
         }
 
-        //todo document method
+        /// <summary>
+        /// Does the complete opposite of the previous method, instead of painting legal squares it removes the red color and sets it 
+        /// to transparent.
+        /// 
+        /// Grid.Children getter from: https://stackoverflow.com/questions/1511722/how-to-programmatically-access-control-in-wpf-grid-by-row-and-column-index 
+        /// </summary>
+        /// <param name="piece">The piece's legal moves to hide.</param>
         private void HideLegalMoves(Piece piece)
         {
             List<string> legalMoves = new List<string>(piece.legalMoves);
@@ -94,25 +102,29 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// The bread and butter of the whole thing. This method checks several parameters to make sure that 
+        /// the player can make its move. 
+        /// </summary>
         private void CanPlayerMakeMove()
         {
             if (controller.IsDestinationPieceSelected())
             {
-                if (controller.IsMoveLegal()) //controller.IsMoveLegal()
+                if (controller.IsMoveLegal()) //Check if the move is legal
                 {
                     HideLegalMoves(controller.GetSourcePiece());
 
-                    if (controller.GetIsPromotion())
+                    if (controller.GetIsPromotion()) //If a pawn is on the last rank of either side, then it should promote
                     {
                         ShowPopup();
                     }
-                    controller.PlaySound(controller.GetSourcePiece().isBlack, false);
-                    UpdateBoard(); //move piece
+                    controller.PlaySound(controller.GetSourcePiece().isBlack, false); //If a move is of type check then this method is called.
 
-                    
+                    UpdateBoard(); //moves pieces visually
 
-                    controller.GenerateLegalMoves();
-                    controller.PlaySound(controller.GetDestinationPiece().isBlack, true);
+
+                    controller.GenerateLegalMoves(); //Generates new legal moves based on the new position.
+                    controller.PlaySound(controller.GetDestinationPiece().isBlack, true); //Should it not be a check the same method is called again, but with different paramters.
                     controller.ResetPieceValues();
                     IsGameOver();
                 }
@@ -120,7 +132,7 @@ namespace Chess
                 {
                     controller.GenerateLegalMoves();
                     HideLegalMoves(controller.GetSourcePiece());
-                   
+
                     controller.ResetPieceValues();
                 }
 
@@ -140,12 +152,16 @@ namespace Chess
             Application.Current.Shutdown();
         }
 
-        private void ClosePopup(object sender, RoutedEventArgs e)
+        private void CloseGameOverPopup(object sender, RoutedEventArgs e)
         {
             GameOver.IsOpen = false;
         }
 
-        //todo document method
+        /// <summary>
+        /// This method works by first checking so that the user have not pressed the same piece twice, as it would result in a null exception. Afterwards
+        /// special cases are set first, this includes castling, en passant and promotion. It then removes previous pieces and sets the new pieces to their
+        /// corresponding locations. Lastly, the visual change is also change in the internal board.
+        /// </summary>
         private void UpdateBoard()
         {
             List<int> sourceCoordinates = controller.GetSourceCoordinates();
@@ -176,13 +192,13 @@ namespace Chess
             List<int> specialCaseCoordinates = controller.GetSpecialCaseCoordinates();
             if (specialCaseCoordinates[0] != 9) //ARBITRARY NUMBERS, does not matter what number it is, as long as it is not a number used by the board.
             {
-                if (specialCaseCoordinates.Count == 2)
+                if (specialCaseCoordinates.Count == 2) //if the move is an en passant
                 {
                     RemovePiece(specialCaseCoordinates);
                     SetPieceToBoard(specialCaseCoordinates, controller.CreatePiece('S', true));
                     controller.ResetSpecialValues();
                 }
-                else if (specialCaseCoordinates.Count == 4)
+                else if (specialCaseCoordinates.Count == 4) //if the move is a castling move, castling moves always have 2 coordinates, hence why it is == 4
                 {
                     List<int> sourcePieceCoordinates = new List<int> { specialCaseCoordinates[0], specialCaseCoordinates[1] };
                     List<int> destinationPieceCoordinates = new List<int> { specialCaseCoordinates[2], specialCaseCoordinates[3] };
@@ -204,7 +220,13 @@ namespace Chess
             viewModel.RunEventHandler = false;
         }
 
-        //document
+        /// <summary>
+        /// This method sets the correct promotion piece, depending on what pawn reached what rank
+        /// If it reached the seventh rank then a black piece is created. If it reached the zeroth rank then
+        /// a white piece is creating. Every creation is based on the users action.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChoosePieceButtonClick(object sender, RoutedEventArgs e)
         {
             List<int> destinationCoordinates = controller.GetDestinationCoordinates();
@@ -267,6 +289,7 @@ namespace Chess
                 }
             }
 
+            //Reflects the visual changes to the internal board.
             UpdateDestinationPromotionPiece();
             controller.UpdateMovesOnBoard();
             controller.GenerateLegalMoves();
@@ -274,7 +297,9 @@ namespace Chess
             PromotionPopup.IsOpen = false;
         }
 
-        //document
+        /// <summary>
+        /// Sets the destination piece to its corresponding promotion piece.
+        /// </summary>
         private void UpdateDestinationPromotionPiece()
         {
             RemovePiece(controller.GetDestinationCoordinates());
@@ -283,7 +308,12 @@ namespace Chess
 
 
 
-        //todo, document method
+        /// <summary>
+        /// Removes a specific piece from the board.
+        /// 
+        /// Code from: https://stackoverflow.com/questions/1511722/how-to-programmatically-access-control-in-wpf-grid-by-row-and-column-index 
+        /// </summary>
+        /// <param name="coordinates"></param>
         private void RemovePiece(List<int> coordinates)
         {
             var piece = Board.Children.Cast<UIElement>().First(pieceOnBoard
@@ -301,17 +331,15 @@ namespace Chess
             Board.Children.Add(piece);
         }
 
-        public void CreateBoard() //stub, is not possible to do currently.
-        {
-            // Board.Children.Add(controller.CreateGrid());
-
-        }
-
         private Piece[,] GeneratePieces()
         {
             return controller.CreatePieces();
         }
 
+        /// <summary>
+        /// Sets all pieces visually like how they are positioned inside the pieces array.
+        /// </summary>
+        /// <param name="pieces">The array with the pieces</param>
         private void SetPiecesToBoard(Piece[,] pieces)
         {
             for (int i = 0; i < 8; i++)

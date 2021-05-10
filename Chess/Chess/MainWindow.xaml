@@ -99,7 +99,7 @@
 
                 <Ellipse Width="800" Height="400" Fill="White" Grid.ColumnSpan="4"/>
                 <TextBlock Margin="50" FontSize="30" Grid.Column="0" Width="290" Height="120">Gameover? <LineBreak /> The game might have <LineBreak />more positions. . .</TextBlock>
-                <Button Click="ClosePopup" FontSize="26" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Width="150" Height="150" Background="Green" BorderBrush="{x:Null}">
+                <Button Click="CloseGameOverPopup" FontSize="26" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Width="150" Height="150" Background="Green" BorderBrush="{x:Null}">
                     Continue.
                 </Button>
                 <Button Click="ExitGame" FontSize="26" Grid.Column="2" HorizontalAlignment="Left" Width="150" Height="150" Background="Red" BorderBrush="{x:Null}">

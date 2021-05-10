@@ -12,6 +12,13 @@ namespace Chess
         private Piece[,] board;
         private bool validateKingMoves = false;
 
+        /// <summary>
+        /// Generates legal moves for every piece in. King moves are generated separetely 
+        /// because they require additional validation.
+        /// </summary>
+        /// <param name="board"> The current board.</param>
+        /// <param name="enPassantSquare">The square en passant is valid on.</param>
+        /// <returns></returns>
         public Piece[,] GeneratePseudoLegalMoves(Piece[,] board, List<int> enPassantSquare) //board is binded to Internalboard.
         {
             this.board = (Piece[,])board.Clone();
@@ -48,6 +55,8 @@ namespace Chess
 
             this.board = board;
 
+            //The second validation for king moves only occur when this boolean is set to true.
+            //When it is, a simulated move is played out on a simulated board to test if the move is legal or not.
             if (!validateKingMoves)
             {
                 for (int i = 0; i < 8; i++)
@@ -99,12 +108,21 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Generates queen moves. Since a queen is just a rook and a bishop combined, their respective methods can be used for the queen.
+        /// </summary>
+        /// <param name="currentPiece">The queen</param>
+        /// <param name="y">Y-coordinate</param>
+        /// <param name="x">X-coordinate</param>
+        /// <returns></returns>
         private Piece GenerateQueenMoves(Piece currentPiece, int y, int x)
         {
             List<string> legalMoves = new List<string>();
+
             //since a queen is just a bishop and a rook combinded, their respective methods can be used to generate pseudo-legal moves
             Piece lateralPiece = GenerateLateralMoves(currentPiece, y, x, 7);
             Piece diagonalPiece = GenerateDiagonalMoves(currentPiece, y, x, 7);
+
             legalMoves.AddRange(lateralPiece.legalMoves);
             legalMoves.AddRange(diagonalPiece.legalMoves);
             currentPiece.legalMoves = legalMoves;
@@ -112,9 +130,17 @@ namespace Chess
             return currentPiece;
         }
 
-        //todo, document this monster of a method.
+        /// <summary>
+        /// Generates lateral piece moves. This for example for queens, rooks and kings.
+        /// </summary>
+        /// <param name="currentPiece"></param>
+        /// <param name="y">Y-coordinate</param>
+        /// <param name="x">X-coordinate</param>
+        /// <param name="maxLoopValue">The maximum value the piece can move to.</param>
+        /// <returns></returns>
         private Piece GenerateLateralMoves(Piece currentPiece, int y, int x, int maxLoopValue)
         {
+            //It says for Rooks, but this is merely to signal the constructor of the move model to assign lateral move values.
             Rook startPiece = currentPiece as Rook;
             var move = new MoveModel(startPiece, y, x);
 
@@ -159,6 +185,7 @@ namespace Chess
                 {
                     if (!move.IsPositiveOperation)
                     {
+                        //These direction are for negative values.
                         if (move.ActiveDirection + move.DirValue > move.MaxValue)
                         {
                             //Checks whether or not the next square is a piece of the same color and if its a piece on the square
@@ -175,6 +202,9 @@ namespace Chess
                                 //If the next position is a piece, then no more moves can be generated for that direction.
                                 if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                                 {
+                                    //However, if the piece is a ray piece, then they also attack beyond the next piece, with regards to kings.
+                                    //This means that the piece is still attacking even if it cannot specifically move there.
+                                    //The attacking square values are only used are only used when validating king moves.
                                     if (currentPiece is Rook rook)
                                     {
                                         if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
@@ -193,6 +223,7 @@ namespace Chess
                                     break;
                                 }
 
+                                //Increment the offset depending on the current direction.
                                 if (move.YOffset == 0)
                                 {
                                     move.XOffset += move.N;
@@ -213,6 +244,8 @@ namespace Chess
                     }
                     else
                     {
+                        //The logic below is the same as above, with the difference being in what direction it is looking.
+                        //These direction are for positive values.
                         if (move.ActiveDirection + move.DirValue < move.MaxValue && (move.XOffset >= 0 && move.YOffset >= 0))
                         {
                             if (currentPiece.isBlack == board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
@@ -268,13 +301,23 @@ namespace Chess
             return currentPiece;
         }
 
-        //todo, document this monster of a method.
+        /// <summary>
+        /// Generates diagonal moves. This is for example queens, bishops and kings.
+        /// 
+        /// Delegate code comes from: https://stackoverflow.com/questions/25676074/is-it-possible-to-store-a-math-operation-in-a-variable-and-call-on-that-vari 
+        /// </summary>
+        /// <param name="currentPiece">The piece to generate legal moves for</param>
+        /// <param name="y">Y-coordinate</param>
+        /// <param name="x">X-coordinate</param>
+        /// <param name="maxLoopValue"> The maximum value the piece can move to</param>
+        /// <returns>The maximum value the piece can move to.</returns>
         private Piece GenerateDiagonalMoves(Piece currentPiece, int y, int x, int maxLoopValue)
         {
+            //It says for Bishops, but this is merely to signal the constructor of the move model to assign diagonal move values.
             Bishop startPiece = currentPiece as Bishop;
             var move = new MoveModel(startPiece, y, x);
 
-            //delegates for choosing what operation to use
+            //Delegates for choosing what operation to use
             Func<int, int, bool> greaterThanDelegate = (a, b) => a > b;
             Func<int, int, bool> lessThanDelegate = (a, b) => a < b;
             var operationY = greaterThanDelegate;
@@ -339,20 +382,27 @@ namespace Chess
 
                 for (int j = 0; j < maxLoopValue; j++)
                 {
+                    //Checks so that the current position is not out of bounds.
                     if (operationY(move.ActiveDirectionY + move.DirValueY, move.MaxValueY) && operationX(move.ActiveDirectionX + move.DirValueX, move.MaxValueX))
                     {
+                        //Checks whether or not the next square is a piece of the same color and if its a piece on the square.
                         if (currentPiece.isBlack == board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                         {
                             break;
                         }
                         else
                         {
+                            //If not then add that position to the piece.
                             currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                             move.ActiveDirectionY += move.NY;
                             move.ActiveDirectionX += move.NX;
 
+                            //If the next position is a piece, then no more moves can be generated for that direction.
                             if (currentPiece.isBlack != board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare))
                             {
+                                //However, if the piece is a ray piece, then they also attack beyond the next piece, with regards to kings.
+                                //This means that the piece is still attacking even if it cannot specifically move there.
+                                //The attacking square values are only used are only used when validating king moves.
                                 if (currentPiece is Bishop bishop)
                                 {
                                     if (board[move.TempY + move.YOffset, move.TempX + move.XOffset] is King)
@@ -369,6 +419,7 @@ namespace Chess
                                 }
                                 break;
                             }
+                            //Increment the offset by a constant in a specific direction that depends on which direction the method is currently searching.
                             move.XOffset += move.NX;
                             move.YOffset += move.NY;
                         }
@@ -378,11 +429,20 @@ namespace Chess
             return currentPiece;
         }
 
-        //todo, document this monster of a method.
+        /// <summary>
+        /// Generates knight moves.
+        /// 
+        /// Delegate code comes from: https://stackoverflow.com/questions/25676074/is-it-possible-to-store-a-math-operation-in-a-variable-and-call-on-that-vari 
+        /// </summary>
+        /// <param name="currentPiece"></param>
+        /// <param name="y">Y-coordinate</param>
+        /// <param name="x">X-coordinate</param>
+        /// <returns></returns>
         private Piece GenerateKnightMoves(Piece currentPiece, int y, int x)
         {
             Knight knight = currentPiece as Knight;
             var move = new MoveModel(knight, y, x);
+
             //delegates for choosing what operation to use
             Func<int, int, bool> greaterThanDelegate = (a, b) => a > b;
             Func<int, int, bool> lessThanDelegate = (a, b) => a < b;
@@ -396,7 +456,8 @@ namespace Chess
             {
                 switch (i)
                 {
-                    //document what the numbers mean
+                    //Each number represents a specific square where the knight can move to.
+                    //A knight can only move to very specific squares. Which means each direction can easily be set for each move.
                     case 1: //East
                         move.YOffset = -1;
                         move.XOffset = 2;
@@ -437,18 +498,22 @@ namespace Chess
                         break;
                 }
 
-                //document what this thing does
+
                 for (int j = 0; j < 2; j++)
                 {
+                    //First it checks if the current search is not outside the legal bounds
                     if ((operationY(move.TempY + move.YOffset, move.MaxValueY) && operationX(move.TempX + move.XOffset, move.MaxValueX)) && (move.TempY + move.YOffset > -1 && move.TempX + move.XOffset > -1))
                     {
+                        //It then checks so that the current search is not of the same piece color and also if it is a piece.
                         if (!(currentPiece.isBlack == board[move.TempY + move.YOffset, move.TempX + move.XOffset].isBlack && !(board[move.TempY + move.YOffset, move.TempX + move.XOffset] is EmptySquare)))
                         {
                             currentPiece.legalMoves.Add((move.TempY + move.YOffset) + " " + (move.TempX + move.XOffset));
                         }
                     }
-                    move.YOffset *= move.NY;
-                    move.XOffset *= move.NX;
+
+                    //Then mirror the values to the opposite position for a knight
+                    move.YOffset *= move.NY; //Multiplied with -1 to change the direction to the opposite side.
+                    move.XOffset *= move.NX; //- || -
                     move.MaxValueY = move.NewMaxValueY;
                     move.MaxValueX = move.NewMaxValueX;
                     operationY = newOperationY;
@@ -459,16 +524,25 @@ namespace Chess
             return currentPiece;
         }
 
-        //todo, document this monster of a method.
+        /// <summary>
+        /// Generates legal moves for pawns.
+        /// 
+        /// Delegate code comes from: https://stackoverflow.com/questions/25676074/is-it-possible-to-store-a-math-operation-in-a-variable-and-call-on-that-vari 
+        /// </summary>
+        /// <param name="currentPiece"></param>
+        /// <param name="y">Y-coordinate</param>
+        /// <param name="x">X-coordinate</param>
+        /// <param name="enPassantCoordinate"></param>
+        /// <returns></returns>
         private Piece GeneratePawnMoves(Piece currentPiece, int y, int x, List<int> enPassantCoordinate)
         {
             Pawn pawn = currentPiece as Pawn;
-            //Assuming it is a black pawn those values are set, otherwise it is set to white on line 389.
+            //Assuming it is a black pawn those values are set, otherwise it is set to white on line 555.
             var move = new MoveModel(pawn, y, x, true);
 
             bool isDiagonalMove = false;
 
-            //delegates for choosing what operation to use
+            //Delegates for choosing what operation to use
             Func<int, int, bool> greaterThanDelegate = (a, b) => a > b;
             Func<int, int, bool> lessThanDelegate = (a, b) => a < b;
             var operationY = lessThanDelegate;
@@ -477,7 +551,7 @@ namespace Chess
             var newOperationX = greaterThanDelegate;
             var newOppositeOperationX = lessThanDelegate;
 
-            //set position specific values for white
+            //Set position specific values for white
             if (!pawn.isBlack)
             {
                 move = new MoveModel(pawn, y, x, false);
@@ -610,9 +684,16 @@ namespace Chess
             return pawn;
         }
 
-        //document
+        /// <summary>
+        /// Generates king moves.
+        /// </summary>
+        /// <param name="currentPiece"></param>
+        /// <param name="y">Y-coordinate</param>
+        /// <param name="x">X-coordinate</param>
+        /// <returns></returns>
         private Piece GenerateKingMoves(King currentPiece, int y, int x)
         {
+            //A king is technically a rook and a bishop, just restricted based on how many squares it can move to.
             List<string> kingMoves = GenerateLateralKingMoves(currentPiece, y, x);
             kingMoves.AddRange(GenerateDiagonalKingMoves(currentPiece, y, x));
             kingMoves.AddRange(GetKingCastleCoordinates(currentPiece, y, x));
@@ -621,6 +702,7 @@ namespace Chess
             List<string> attackingSquares = new List<string>();
             attackingSquares.AddRange(kingMoves);
 
+            //Removes duplicate values from attacking squares.
             for (int i = 0; i < attackingSquares.Count; i++)
             {
                 for (int j = 0; j < attackingSquares.Count - 1; j++)
@@ -632,7 +714,6 @@ namespace Chess
                         break;
                     }
                 }
-
             }
 
             currentPiece.attckingSquares = new List<string>(attackingSquares);
@@ -640,30 +721,35 @@ namespace Chess
             //due to a "bug" with "AddRange", duplicate values were assigned, creating a need for distinct values
             kingMoves = kingMoves.Distinct().ToList();
 
-
+            //Remove illegal squares for the current king.
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    // if (!board[i, j].typeOfPiece.Equals("King"))
-                    // {
                     if (!(board[i, j] is EmptySquare))
                     {
                         var selectedPiece = board[i, j];
+
+                        //If the king's color is not the same as the the selectedpiece's color.
                         if (currentPiece.isBlack != board[i, j].isBlack)
                         {
                             kingMoves = RemoveIllegalSquaresForKing(kingMoves, selectedPiece);
                         }
                     }
-                    // }
                 }
             }
             currentPiece.legalMoves = RemoveIllegalKingCaptureSquares(kingMoves, currentPiece);
+
             return currentPiece;
         }
 
 
-        //removes capture squares that is protected by another square, document more
+        /// <summary>
+        /// Removes capture squares for the king that is protected by another square.
+        /// </summary>
+        /// <param name="kingMoves"></param>
+        /// <param name="king"></param>
+        /// <returns></returns>
         private List<string> RemoveIllegalKingCaptureSquares(List<string> kingMoves, Piece king)
         {
             var tempBoard = (Piece[,])board.Clone();
@@ -709,7 +795,6 @@ namespace Chess
                         tempBoard[kingY, kingX] = tempPiece;
                     }
                 }
-
             }
 
             //Removes any illegal squares that the previous method returned.
@@ -757,10 +842,19 @@ namespace Chess
             return false;
         }
 
+        /// <summary>
+        /// Takes advantage of the fact that kings can ONLY castle in a set position in normal chess,
+        ///  for variants such as Chess960, other more elaborate methods need to be applied due to the 
+        ///  bizarre situations that can occur 
+        /// 
+        /// All the values are for standard castle positions in chess.
+        /// 
+        /// </summary>
+        /// <param name="currentPiece"></param>
+        /// <param name="y"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
 
-        //document, takes advantage of the fact that kings can ONLY castle in a set position in normal chess,
-        //for variants such as Chess960, other more elaborate methods need to be applied due to the 
-        //bizarre situations that can occur
         private List<string> GetKingCastleCoordinates(Piece currentPiece, int y, int x)
         {
             King king = currentPiece as King;
@@ -823,6 +917,11 @@ namespace Chess
             return castleCoordinates;
         }
 
+        /// <summary>
+        /// Removes any squares that the opposite king attacks.
+        /// </summary>
+        /// <param name="chessBoard"></param>
+        /// <returns></returns>
         private Piece[,] RemoveOppositeKingAttackingSquares(Piece[,] chessBoard)
         {
             King king = null;
@@ -832,6 +931,7 @@ namespace Chess
             {
                 for (int j = 0; j < 8; j++)
                 {
+                    //Get both king coordinates
                     if (chessBoard[i, j] is King && !chessBoard[i, j].isBlack)
                     {
                         king = (King)chessBoard[i, j];
@@ -853,12 +953,14 @@ namespace Chess
                 {
                     for (int j = 0; j < oppositeKing.attckingSquares.Count; j++)
                     {
+                        //If any squares of the current king that the opposite king attacks equals one another, then, remove that coordinate.
                         if (currentKing.attckingSquares.Contains(oppositeKing.attckingSquares[j]))
                         {
                             currentKing.legalMoves.Remove(oppositeKing.attckingSquares[j]);
                         }
                     }
 
+                    //Swap the values for both kings, so that the opposite colored king is tested instead.
                     if (i == currentKing.legalMoves.Count && !isBothKingsValidated)
                     {
                         currentKing = oppositeKing;
@@ -873,7 +975,12 @@ namespace Chess
             return chessBoard;
         }
 
-        //document
+        /// <summary>
+        /// Removes any squares that other pieces attacks.
+        /// </summary>
+        /// <param name="kingMoves"></param>
+        /// <param name="selectedPiece"></param>
+        /// <returns></returns>
         private List<string> RemoveIllegalSquaresForKing(List<string> kingMoves, Piece selectedPiece)
         {
             List<string> coordinatesToBeDeleted = new List<string>(kingMoves.Count);
@@ -917,6 +1024,7 @@ namespace Chess
                 }
             }
 
+            //Removes squares that ray pieces attacks. This also includes squares that are on the other side of the king if the ray piece attacks that square.
             if (selectedPiece is Rook || selectedPiece is Bishop || selectedPiece is Queen)
             {
                 coordinatesToBeDeleted.AddRange(RemoveXraySquaresFromKing(selectedPiece, kingMoves));
@@ -925,7 +1033,7 @@ namespace Chess
 
 
 
-            //delete previous pseudo-legal moves for the current king
+            //Deletes any position that other pieces attacks
             for (int i = 0; i < coordinatesToBeDeleted.Count; i++)
             {
                 kingMoves.Remove(coordinatesToBeDeleted[i]);
@@ -934,6 +1042,14 @@ namespace Chess
             return kingMoves;
         }
 
+        /// <summary>
+        /// Removes xray attacking squares from the king.
+        /// The logic is the same as any other square removing methods,
+        /// with the slight difference being that it is for specifically ray pieces.
+        /// </summary>
+        /// <param name="selectedPiece"></param>
+        /// <param name="kingMoves"></param>
+        /// <returns></returns>
         private List<string> RemoveXraySquaresFromKing(Piece selectedPiece, List<string> kingMoves)
         {
             List<string> coordinatesToBeDeleted = new List<string>(kingMoves.Count);
@@ -953,7 +1069,12 @@ namespace Chess
             return coordinatesToBeDeleted;
         }
 
-        public string CheckCastlingSquares(string castlingSquare)
+        /// <summary>
+        /// Returns illegal castling squares.
+        /// </summary>
+        /// <param name="castlingSquare"></param>
+        /// <returns></returns>
+        private string CheckCastlingSquares(string castlingSquare)
         {
             //positive x-axis for black king
             if (castlingSquare.Equals(0 + " " + 5))
@@ -978,6 +1099,13 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Generates lateral moves for the king.
+        /// </summary>
+        /// <param name="currentPiece"></param>
+        /// <param name="y"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
         private List<string> GenerateLateralKingMoves(Piece currentPiece, int y, int x)
         {
             List<string> legalMoves = new List<string>();
@@ -986,6 +1114,13 @@ namespace Chess
             return legalMoves;
         }
 
+        /// <summary>
+        /// Generates diagonal moves for the king.
+        /// </summary>
+        /// <param name="currentPiece"></param>
+        /// <param name="y"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
         private List<string> GenerateDiagonalKingMoves(Piece currentPiece, int y, int x)
         {
             List<string> legalMoves = new List<string>();

@@ -9,7 +9,7 @@ namespace Chess.PieceFactory
     public class PieceFactory : IPieceFactory
     {
         /// <summary>
-        /// Creates a piece a specific piece depending on what kind of char that is taken in. Depending on the char a specific
+        /// Creates a specific piece depending on what kind of char that is taken in. Depending on the char a specific
         /// piece is created. What the chars means can be seen in the FEN-Notation wiki.
         /// 
         /// https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation

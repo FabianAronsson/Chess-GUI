@@ -1,4 +1,4 @@
-# Chess Simulator.
+# Chess Simulator
 
 This is a chess simulator where you are able to play chess against yourself or a friend. 
 

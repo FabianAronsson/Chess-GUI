@@ -1,0 +1,16 @@
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\bin\Windows\Chess.exe.config
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\bin\Windows\Chess.exe
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\bin\Windows\Chess.pdb
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess.csproj.AssemblyReference.cache
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess.csproj.SuggestedBindingRedirects.cache
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\MainWindow.g.cs
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\App.g.cs
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess_MarkupCompile.cache
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess_MarkupCompile.lref
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\MainWindow.baml
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess.g.resources
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess.Properties.Resources.resources
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess.csproj.GenerateResource.cache
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess.csproj.CoreCompileInputs.cache
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess.exe
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\Windows\Chess.pdb

@@ -1,0 +1,8 @@
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\ARM64\Windows\Chess.csproj.AssemblyReference.cache
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\ARM64\Windows\Chess.csproj.SuggestedBindingRedirects.cache
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\ARM64\Windows\MainWindow.g.cs
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\ARM64\Windows\App.g.cs
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\ARM64\Windows\Chess_MarkupCompile.cache
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\ARM64\Windows\Chess_MarkupCompile.lref
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\ARM64\Windows\Chess.exe
+C:\Users\Fabian\Source\Repos\Slutprojekt-Programmering-2\Chess\Chess\obj\ARM64\Windows\Chess.pdb
